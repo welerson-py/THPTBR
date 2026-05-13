@@ -1,0 +1,12 @@
+# Torch CPU é instalado separadamente com --index-url
+# Resto vai pelo PyPI normal
+numpy
+faster-whisper>=1.0
+transformers>=4.40
+sentencepiece
+sentence-transformers>=3.0
+chromadb>=0.5
+streamlit>=1.30
+pyyaml
+huggingface_hub
+soundfile

@@ -1,0 +1,29 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+
+# Generated / large data
+data/audio/
+data/transcripts/
+data/chroma/
+data/processed.txt
+data/failed.txt
+
+# Model caches (HuggingFace downloads to ~/.cache by default)
+.cache/
+hf_cache/
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# Logs and temp
+*.log
+*.tmp
