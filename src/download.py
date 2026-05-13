@@ -55,12 +55,13 @@ def download_audio(url: str) -> Path | None:
         "--audio-format", "mp3",
         "--audio-quality", "4",
         "--no-playlist",
-        "-o", str(AUDIO_DIR / "%(id)s.%(ext)s"),
-        url,
     ]
     if FFMPEG_DIR:
-        cmd.insert(-2, "--ffmpeg-location")
-        cmd.insert(-2, FFMPEG_DIR)
+        cmd.extend(["--ffmpeg-location", FFMPEG_DIR])
+    cmd.extend([
+        "-o", str(AUDIO_DIR / "%(id)s.%(ext)s"),
+        url,
+    ])
     r = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace")
     if r.returncode != 0:
         print(f"yt-dlp failed for {url}:\n{r.stderr[-500:]}")
