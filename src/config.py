@@ -17,6 +17,9 @@ WHISPER_MODEL = "small"
 WHISPER_COMPUTE = "int8"
 WHISPER_LANG = "ht"
 
+# ASR backend for batch: "whisper" (rápido) | "mms" (qualidade) | "hybrid" (Whisper segmenta, MMS transcreve)
+ASR_BACKEND = "hybrid"
+
 NLLB_MODEL = "facebook/nllb-200-distilled-600M"
 NLLB_SRC = "hat_Latn"
 NLLB_TGT = "por_Latn"

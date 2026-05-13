@@ -4,6 +4,7 @@ from typing import Iterable
 
 import chromadb
 from sentence_transformers import SentenceTransformer
+from rapidfuzz import fuzz
 
 from config import EMBED_MODEL, CHROMA_DIR, CHROMA_COLLECTION
 
@@ -46,14 +47,31 @@ def upsert(records: Iterable[dict]):
     get_collection().upsert(ids=ids, documents=docs, metadatas=metas, embeddings=embs)
 
 
-def search(query: str, n: int = 5) -> list[dict]:
-    emb = embed([query])[0]
-    res = get_collection().query(query_embeddings=[emb], n_results=n)
+def search(query: str, n: int = 5, alpha: float = 0.55) -> list[dict]:
+    """Hybrid search: vector similarity + fuzzy text match on kreyol/portuguese fields.
+
+    alpha = weight of vector score vs fuzzy score (0.55 = slightly favor vector).
+    Pulls top 30 vector candidates, re-ranks with fuzzy boost on kr+pt fields."""
+    q = query.strip()
+    if not q:
+        return []
+    emb = embed([q])[0]
+    pool = max(n * 6, 30)
+    res = get_collection().query(query_embeddings=[emb], n_results=pool)
+    if not res["ids"] or not res["ids"][0]:
+        return []
     out = []
     for i in range(len(res["ids"][0])):
         m = res["metadatas"][0][i]
+        vec = 1 - res["distances"][0][i]
+        kr_fuzzy = fuzz.WRatio(q, m["kreyol"]) / 100.0
+        pt_fuzzy = fuzz.WRatio(q, m["portuguese"]) / 100.0
+        fuzzy = max(kr_fuzzy, pt_fuzzy)
+        combined = alpha * vec + (1 - alpha) * fuzzy
         out.append({
-            "score": 1 - res["distances"][0][i],
+            "score": round(combined, 3),
+            "vec_score": round(vec, 3),
+            "fuzzy_score": round(fuzzy, 3),
             "kreyol": m["kreyol"],
             "portuguese": m["portuguese"],
             "video_id": m["video_id"],
@@ -61,7 +79,8 @@ def search(query: str, n: int = 5) -> list[dict]:
             "end": m["end"],
             "context": m.get("context", ""),
         })
-    return out
+    out.sort(key=lambda r: -r["score"])
+    return out[:n]
 
 
 def count() -> int:

@@ -12,6 +12,10 @@ data/transcripts/
 data/chroma/
 data/processed.txt
 data/failed.txt
+data/tts_test.wav
+
+# Downloaded models (~4 GB)
+models/
 
 # Model caches (HuggingFace downloads to ~/.cache by default)
 .cache/
