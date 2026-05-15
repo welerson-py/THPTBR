@@ -1,12 +1,33 @@
-# Oficina de Imigrantes — Kreyòl Ayisyen ↔ Português
+# 🇧🇷🤝🇭🇹 Oficina de Imigrantes — Kreyòl Ayisyen ↔ Português
 
-Sistema local de IA para workshop de imigrantes haitianos no Brasil. Processa vídeos do YouTube em kreyòl, transcreve, traduz para português, e oferece:
+> *"Konte sou mwen, mwen avèk ou."* — Pode contar comigo, tô junto.
+
+Sistema local de IA para workshop de imigrantes haitianos no Brasil. Aprende do YouTube em kreyòl, traduz pra português com **alma cultural** (não só palavra-por-palavra), e oferece 3 ferramentas pra workshop:
 
 - **📚 Dicionário** vetorial com áudio (clica e ouve a professora nativa dizendo a palavra)
-- **🎙️ Conversa ao vivo** via microfone (PT↔KR em tempo real)
-- **🤝 Modo Imigrante** com botões grandes em kreyòl pra ele se virar sozinho
+- **🎙️ Conversa ao vivo** via microfone (PT↔KR em tempo real, voz sintetizada em kreyòl)
+- **🤝 Modo Imigrante** com botões grandes em kreyòl pro próprio imigrante se virar
 
-Tudo roda local, offline. Sem custos de API, sem dependência de internet durante o workshop.
+**Tudo roda local, offline.** Sem custos de API. Sem dependência de internet durante o workshop. Sem dados saindo do seu notebook.
+
+📊 **Banco atual: 5900+ frases** extraídas de aulas reais de PT→Kreyòl no YouTube.
+
+---
+
+## 👋 Para a equipe (voluntários que vão usar)
+
+Não precisa saber programar pra usar:
+
+1. **Quem cuida do laptop liga ele** e dá dois cliques em **`iniciar_ui.bat`**
+2. **Espera ~30 segundos** (modelos carregando)
+3. **Conecta o celular** na mesma rede WiFi e abre `http://[ip-do-note]:8501`
+4. **Escolhe a aba**:
+   - **📚 Dicionário**: digita uma palavra em PT ou kreyòl, vê traduções com áudio do vídeo original
+   - **🎙️ Conversa**: aperta gravar, fala em PT, vê texto + ouve áudio em kreyòl pro imigrante
+   - **🤝 Mòd Imigran**: passa o celular pro imigrante usar com botões grandes em kreyòl
+5. **Se traduziu errado**: edite `data/correcoes.json` com a tradução certa — fica salva pra sempre
+
+🎨 **Visual**: tema caribenho/haitiano com ilustrações tropicais (palmeira, sol, monstera, ave) flutuando nos cantos, cores vivas de bandeira haitiana, padrões geométricos inspirados em cerâmica africana.
 
 ---
 
@@ -260,12 +281,37 @@ py -m venv .venv
 
 ---
 
+## 🆘 Troubleshooting comum
+
+| Problema | Causa provável | Solução |
+|---|---|---|
+| Áudio de TTS demora muito (>10s) | Modelo carregando primeira vez | Aguarde — segundas chamadas são <3s, frases comuns são instantâneas |
+| Mic não funciona no celular | Browser exige HTTPS | Pendente: setup HTTPS local com `mkcert` |
+| Banner sumido | Cache do browser | Ctrl+Shift+R (PC) ou recarregar página puxando de cima (celular) |
+| Tradução culturalmente errada (ex: "tansyon") | NLLB não conhece a gíria | Adicione em `data/correcoes.json` |
+| Daemon trava num vídeo | Vídeo muito longo (>30min) | Adicione no `data/failed.txt` com motivo |
+| Não tem internet no workshop | Já baixou os modelos? | Tudo funciona offline depois dos modelos baixados (~10GB) |
+
+---
+
 ## 🤝 Sobre o projeto
 
-Construído pra workshop de inclusão digital de imigrantes haitianos em São Paulo. Deadline original: maio/2026.
+Construído pra workshop de inclusão digital de imigrantes haitianos em São Paulo (2026).
 
-A ideia central: **o sistema só é útil se o imigrante sentir que vocês se deram ao trabalho de entender como ele pensa**. Por isso as 4 camadas, as gírias, o calor humano embutido. Tradução literal é só o ponto de partida — tradução **com alma** é o objetivo.
+A ideia central: **o sistema só é útil se o imigrante sentir que vocês se deram ao trabalho de entender como ele pensa**. Por isso as 4 camadas de tradução, as 100+ gírias cadastradas, o calor humano embutido. Tradução literal é só o ponto de partida — **tradução com alma** é o objetivo.
 
-> "Konte sou mwen, mwen avèk ou."
+**O sistema sabe a diferença entre:**
+- "Esse exercício é fácil" → "Egzèsis sa a fasil" *(tradução literal)*
+- "Esse exercício é **mamão com açúcar**" → "Egzèsis sa a, **se dlo kòk**!" *(equivalente cultural haitiano: água de coco)*
+
+Esse pequeno gesto faz o imigrante sorrir e sentir que está em casa.
+
+---
+
+## 📝 Licença & Créditos
+
+Código sob Apache 2.0 (ver LICENSE). Construído com modelos open-source da Meta (MMS, NLLB) e OpenAI (Whisper).
+
+> *"Bonjou, zanmi m! Byenvini lakay nou."* — Olá, amigo! Bem-vindo à nossa casa.
 
 🇧🇷🤝🇭🇹
