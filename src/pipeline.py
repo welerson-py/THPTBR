@@ -7,7 +7,7 @@ sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 from download import download_audio, video_id
 from transcribe import transcribe
-from translate import translate
+from translate import translate, batch_kr_to_pt
 from embed_store import upsert
 from config import TRANSCRIPT_DIR
 
@@ -161,19 +161,27 @@ def process_url(url: str, redo: bool = False) -> dict:
     segments = transcribe(audio)
     print(f"      {len(segments)} segments")
 
-    print(f"[3/4] expand + translate to Portuguese (NLLB where needed)")
+    print(f"[3/4] expand + batch-translate to Portuguese (NLLB)")
     records = []
+    pending_translate_idx: list[int] = []
+    pending_translate_txt: list[str] = []
     paired_count = 0
-    nllb_count = 0
     for i, seg in enumerate(segments):
         for r in expand_segment(seg, vid, i):
             if r.pop("_skip_nllb", False):
                 paired_count += 1
+                records.append(r)
             else:
-                r["portuguese"] = translate(r["kreyol"])
-                nllb_count += 1
-            records.append(r)
-    print(f"      {len(records)} records  ({paired_count} pareados pela professora, {nllb_count} via NLLB)")
+                # Marca pra batch
+                records.append(r)
+                pending_translate_idx.append(len(records) - 1)
+                pending_translate_txt.append(r["kreyol"])
+    # Tradução em batch (muito mais rápido que serial)
+    if pending_translate_txt:
+        translations = batch_kr_to_pt(pending_translate_txt, batch_size=8)
+        for idx, pt in zip(pending_translate_idx, translations):
+            records[idx]["portuguese"] = pt
+    print(f"      {len(records)} records  ({paired_count} pareados pela professora, {len(pending_translate_idx)} via NLLB batch)")
     for r in records[:8]:
         print(f"      [{r['start']:6.1f}] KR: {r['kreyol'][:40]:40s} | PT: {r['portuguese'][:40]}")
 

@@ -1,5 +1,18 @@
 """Central configuration for the pipeline."""
+import os
 from pathlib import Path
+
+# CPU performance: use all cores for torch/MKL/OpenMP (user explicitly accepted high CPU)
+_NCORES = os.cpu_count() or 4
+os.environ.setdefault("OMP_NUM_THREADS", str(_NCORES))
+os.environ.setdefault("MKL_NUM_THREADS", str(_NCORES))
+os.environ.setdefault("OPENBLAS_NUM_THREADS", str(_NCORES))
+try:
+    import torch  # noqa: E402
+    torch.set_num_threads(_NCORES)
+    torch.set_num_interop_threads(min(2, _NCORES))
+except Exception:
+    pass
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
@@ -14,7 +27,7 @@ FAILED_FILE = DATA / "failed.txt"
 for d in (AUDIO_DIR, TRANSCRIPT_DIR, CHROMA_DIR, TTS_CACHE_DIR):
     d.mkdir(parents=True, exist_ok=True)
 
-WHISPER_MODEL = "small"
+WHISPER_MODEL = "medium"  # upgrade pra qualidade (3x maior, melhor com kreyol)
 WHISPER_COMPUTE = "int8"
 WHISPER_LANG = "ht"
 

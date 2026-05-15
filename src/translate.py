@@ -36,6 +36,65 @@ def _translate_chunk(text: str, src_lang: str, tgt_lang: str) -> str:
     return tok.decode(out[0], skip_special_tokens=True).strip()
 
 
+def batch_translate(texts: list[str], src_lang: str, tgt_lang: str, batch_size: int = 8) -> list[str]:
+    """Traduz muitos textos de uma vez via batching no NLLB. Muito mais rapido que serial.
+    Aplica overrides do correcoes.json antes de mandar pro NLLB."""
+    if not texts:
+        return []
+    results: list[str] = [""] * len(texts)
+    todo_idx: list[int] = []
+    todo_txt: list[str] = []
+    # Check overrides primeiro (KR->PT ou PT->KR baseado em direcao)
+    is_kr_to_pt = (src_lang == "hat_Latn" and tgt_lang == "por_Latn")
+    is_pt_to_kr = (src_lang == "por_Latn" and tgt_lang == "hat_Latn")
+    for i, t in enumerate(texts):
+        if not t or not t.strip():
+            results[i] = ""
+            continue
+        if is_kr_to_pt:
+            ov = get_kr_to_pt(t)
+            if ov:
+                results[i] = ov
+                continue
+        elif is_pt_to_kr:
+            ov = get_pt_to_kr(t)
+            if ov:
+                results[i] = ov
+                continue
+        todo_idx.append(i)
+        todo_txt.append(t.strip())
+
+    if not todo_txt:
+        return results
+
+    tok, model = get_model()
+    tok.src_lang = src_lang
+    tgt_id = tok.convert_tokens_to_ids(tgt_lang)
+
+    for chunk_start in range(0, len(todo_txt), batch_size):
+        chunk = todo_txt[chunk_start:chunk_start + batch_size]
+        inputs = tok(chunk, return_tensors="pt", padding=True, truncation=True, max_length=256)
+        with torch.no_grad():
+            out = model.generate(
+                **inputs,
+                forced_bos_token_id=tgt_id,
+                max_length=256,
+                num_beams=2,
+                no_repeat_ngram_size=3,
+                early_stopping=True,
+            )
+        decoded = tok.batch_decode(out, skip_special_tokens=True)
+        for j, txt in enumerate(decoded):
+            idx = todo_idx[chunk_start + j]
+            results[idx] = txt.strip()
+    return results
+
+
+def batch_kr_to_pt(texts: list[str], batch_size: int = 8) -> list[str]:
+    """Batch translate kreyol -> portuguese (usado no pipeline batch)."""
+    return batch_translate(texts, "hat_Latn", "por_Latn", batch_size)
+
+
 def _translate(text: str, src_lang: str, tgt_lang: str) -> str:
     text = text.strip()
     if not text:

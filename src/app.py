@@ -42,16 +42,16 @@ st.markdown("""
 st.title("🎓 Oficina de Imigrantes")
 st.caption("**Kreyòl Ayisyen** ↔ **Português** — dicionário com áudio + conversa ao vivo")
 
-# Banner de boas-vindas RS + Haiti (calor de oficina)
+# Banner de boas-vindas BR + Haiti (calor de oficina)
 st.markdown("""
 <div style="background: linear-gradient(135deg, rgba(74,222,128,0.12), rgba(96,165,250,0.12));
             border-left: 6px solid #4ade80; border-right: 6px solid #60a5fa;
             border-radius: 0.5rem; padding: 1rem 1.5rem; margin: 1rem 0;">
   <div style="font-size: 1.3rem; font-weight: 600; margin-bottom: 0.5rem;">
-    🇧🇷 Olá, parceiro! Bem-vindo. Aqui estamos juntos pra aprender. Não te fresqueia, tô contigo.
+    🇧🇷 Olá, parceiro! Bem-vindo. Aqui estamos juntos pra aprender. Pode contar comigo, tô junto.
   </div>
   <div style="font-size: 1.3rem; font-weight: 600; color: #4ade80;">
-    🇭🇹 Bonjou, zanmi m! Byenvini lakay nou. Nou ansanm pou aprann. Pa pè, m la avèk ou.
+    🇭🇹 Bonjou, zanmi m! Byenvini lakay nou. Nou ansanm pou aprann. Konte sou mwen, mwen avèk ou.
   </div>
 </div>
 """, unsafe_allow_html=True)
