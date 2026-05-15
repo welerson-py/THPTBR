@@ -76,12 +76,69 @@ st.markdown("""
   height: 20px;
 }
 
-/* ---- Background sutil de toda a pagina ---- */
+/* ---- Background: navy profundo com padrao labirinto sutil + manchas quentes ---- */
 .stApp {
+  background-color: #0a1628;
   background-image:
-    radial-gradient(circle at 15% 20%, rgba(229,89,52,0.05) 0%, transparent 40%),
-    radial-gradient(circle at 85% 80%, rgba(45,159,106,0.05) 0%, transparent 40%),
-    radial-gradient(circle at 50% 50%, rgba(248,198,48,0.03) 0%, transparent 60%);
+    radial-gradient(circle at 12% 18%, rgba(229,89,52,0.12) 0%, transparent 35%),
+    radial-gradient(circle at 88% 82%, rgba(45,159,106,0.12) 0%, transparent 35%),
+    radial-gradient(circle at 50% 50%, rgba(248,198,48,0.05) 0%, transparent 70%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%23F8C630' stroke-width='1' opacity='0.04'%3E%3Cpath d='M10,10 L40,10 L40,40 L10,40 Z M50,10 L80,10 L80,40 L50,40 Z M90,10 L110,10 L110,40 L90,40 Z'/%3E%3Cpath d='M20,20 L30,20 L30,30 L20,30 Z M60,20 L70,20 L70,30 L60,30 Z M95,20 L105,20 L105,30 L95,30 Z'/%3E%3Cpath d='M10,50 L25,50 L25,70 L10,70 Z M35,50 L55,50 L55,70 L35,70 Z M65,50 L110,50 L110,70 L65,70 Z'/%3E%3Cpath d='M10,80 L60,80 L60,110 L10,110 Z M70,80 L110,80 L110,110 L70,110 Z'/%3E%3Cpath d='M75,85 L85,85 L85,95 L75,95 Z M90,90 L100,90 L100,100 L90,100 Z'/%3E%3C/g%3E%3C/svg%3E");
+  background-attachment: fixed;
+}
+
+/* ---- Icones tropicais flutuantes (decoracao fixa nos cantos) ---- */
+.tropical-decor {
+  position: fixed;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.15;
+}
+.tropical-decor.palm-top-right {
+  top: 20px; right: 20px; width: 80px; height: 100px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 80'%3E%3Crect x='28' y='40' width='4' height='40' fill='%23A0522D'/%3E%3Cpath d='M30,40 Q12,32 3,17' stroke='%232D9F6A' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3Cpath d='M30,40 Q48,32 57,17' stroke='%232D9F6A' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3Cpath d='M30,40 Q40,22 50,3' stroke='%232D9F6A' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3Cpath d='M30,40 Q20,22 10,3' stroke='%232D9F6A' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3Cpath d='M30,40 Q30,25 30,5' stroke='%232D9F6A' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3Ccircle cx='28' cy='42' r='2.5' fill='%23E55934'/%3E%3Ccircle cx='32' cy='44' r='2.5' fill='%23F8C630'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  animation: floatSlow 6s ease-in-out infinite;
+}
+.tropical-decor.sun-bottom-left {
+  bottom: 30px; left: 30px; width: 70px; height: 70px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 60'%3E%3Ccircle cx='30' cy='30' r='12' fill='%23F8C630'/%3E%3Cg stroke='%23E55934' stroke-width='2.5' stroke-linecap='round'%3E%3Cline x1='30' y1='5' x2='30' y2='14'/%3E%3Cline x1='30' y1='46' x2='30' y2='55'/%3E%3Cline x1='5' y1='30' x2='14' y2='30'/%3E%3Cline x1='46' y1='30' x2='55' y2='30'/%3E%3Cline x1='12' y1='12' x2='18' y2='18'/%3E%3Cline x1='42' y1='42' x2='48' y2='48'/%3E%3Cline x1='12' y1='48' x2='18' y2='42'/%3E%3Cline x1='42' y1='18' x2='48' y2='12'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  animation: spinSlow 24s linear infinite, floatSlow 5s ease-in-out infinite;
+}
+.tropical-decor.leaf-top-left {
+  top: 80px; left: 25px; width: 60px; height: 75px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 50'%3E%3Cpath d='M20,5 Q4,15 7,30 Q11,46 20,49 Q29,46 33,30 Q36,15 20,5 Z' fill='%232D9F6A' stroke='%230F2A1D' stroke-width='1'/%3E%3Cpath d='M20,8 L20,46 M13,18 L13,28 M27,18 L27,28 M16,32 L16,40 M24,32 L24,40' stroke='%230F2A1D' stroke-width='1.2' opacity='0.7'/%3E%3Ccircle cx='13' cy='28' r='2' fill='%230F2A1D'/%3E%3Ccircle cx='27' cy='28' r='2' fill='%230F2A1D'/%3E%3Ccircle cx='16' cy='40' r='1.5' fill='%230F2A1D'/%3E%3Ccircle cx='24' cy='40' r='1.5' fill='%230F2A1D'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  animation: floatSlow 7s ease-in-out infinite;
+  animation-delay: -2s;
+}
+.tropical-decor.bird-bottom-right {
+  bottom: 50px; right: 40px; width: 80px; height: 55px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 40'%3E%3Cpath d='M8,25 Q14,12 26,12 Q38,12 42,24 L44,30 L42,32 L24,32 Q12,32 8,25 Z' fill='%23A050A0' stroke='%230F2A1D' stroke-width='1'/%3E%3Cpath d='M14,18 Q18,16 22,18 M28,16 Q32,14 36,16' stroke='%23E55934' stroke-width='1.5' fill='none'/%3E%3Ccircle cx='36' cy='20' r='2.5' fill='%23F8C630'/%3E%3Ccircle cx='36' cy='20' r='1' fill='%230F2A1D'/%3E%3Cpath d='M42,22 L50,20 L42,24 Z' fill='%23F8C630'/%3E%3Cpath d='M14,32 L11,38 L18,35 Z' fill='%23A050A0'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  animation: floatSlow 8s ease-in-out infinite;
+  animation-delay: -3s;
+}
+
+@keyframes floatSlow {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(-12px) rotate(3deg); }
+}
+@keyframes spinSlow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+  .tropical-decor { opacity: 0.08; transform: scale(0.7); }
+  .tropical-decor.palm-top-right { top: 10px; right: 10px; }
+  .tropical-decor.sun-bottom-left { bottom: 60px; left: 10px; }
+  .tropical-decor.leaf-top-left, .tropical-decor.bird-bottom-right { display: none; }
 }
 html, body, [class*="css"] {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -218,27 +275,45 @@ div[data-testid="stContainer"] {
   iframe { height: 180px !important; }
 }
 
-/* ---- Sidebar: solida no mobile (fix da transparencia) e bonita no desktop ---- */
-[data-testid="stSidebar"] {
-  background: linear-gradient(180deg, #0F2A1D 0%, #112d24 100%) !important;
-  border-right: 1px solid var(--c-border);
-  box-shadow: 8px 0 30px rgba(0,0,0,0.4);
+/* ---- Sidebar: 100% solida em mobile, padrao decorativo em desktop ---- */
+[data-testid="stSidebar"],
+section[data-testid="stSidebar"] {
+  background: linear-gradient(180deg, #061322 0%, #0a1a2e 50%, #051219 100%) !important;
+  border-right: 2px solid var(--c-orange) !important;
+  box-shadow: 8px 0 40px rgba(0,0,0,0.6) !important;
+  opacity: 1 !important;
+  z-index: 999999 !important;
 }
-[data-testid="stSidebar"] > div {
+[data-testid="stSidebar"] > div,
+section[data-testid="stSidebar"] > div {
   background: transparent !important;
 }
+/* Padrao labirinto haitiano dentro da sidebar */
+[data-testid="stSidebar"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cg fill='none' stroke='%23F8C630' stroke-width='1' opacity='0.08'%3E%3Crect x='10' y='10' width='40' height='40'/%3E%3Crect x='18' y='18' width='24' height='24'/%3E%3Crect x='25' y='25' width='10' height='10' fill='%23E55934' fill-opacity='0.3'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: repeat;
+  pointer-events: none;
+  z-index: -1;
+}
+/* Borda decorativa colorida no topo da sidebar */
+[data-testid="stSidebar"]::after {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 5px;
+  background: linear-gradient(90deg, var(--c-orange) 0%, var(--c-yellow) 33%, var(--c-green) 66%, var(--c-red) 100%);
+  z-index: 1000;
+}
+
 @media (max-width: 768px) {
-  [data-testid="stSidebar"] {
-    background: linear-gradient(180deg, #0F2A1D, #1a3d2e) !important;
-    box-shadow: 6px 0 40px rgba(0,0,0,0.7) !important;
+  [data-testid="stSidebar"],
+  section[data-testid="stSidebar"] {
+    background: linear-gradient(180deg, #061322, #0a1a2e) !important;
+    box-shadow: 6px 0 50px rgba(0,0,0,0.9) !important;
     backdrop-filter: none !important;
-  }
-  [data-testid="stSidebar"]::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cpath d='M0,20 Q10,10 20,20 T40,20' stroke='%23E55934' stroke-width='1' fill='none' opacity='0.05'/%3E%3C/svg%3E");
-    pointer-events: none;
+    -webkit-backdrop-filter: none !important;
   }
 }
 
@@ -301,15 +376,46 @@ div[data-testid="stContainer"] {
   left: 0;
   top: 0;
 }
+/* Decoracoes SVG no banner (sol e palmeira) */
+.welcome-deco-left, .welcome-deco-right {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  opacity: 0.35;
+  pointer-events: none;
+}
+.welcome-deco-left {
+  top: 50%; left: -10px;
+  transform: translateY(-50%);
+  animation: spinSlow 30s linear infinite;
+}
+.welcome-deco-right {
+  top: 50%; right: -5px;
+  transform: translateY(-50%);
+  animation: floatSlow 5s ease-in-out infinite;
+}
+@media (max-width: 768px) {
+  .welcome-deco-left, .welcome-deco-right { display: none; }
+  .welcome-banner { padding: 1.2rem 1.2rem; }
+}
 
-/* ---- Divider decorativo entre secoes ---- */
+/* ---- Divider decorativo entre secoes (tres variantes) ---- */
 .divider-haiti {
   margin: 2rem 0;
-  height: 24px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 24'%3E%3Cpolygon points='30,4 36,12 30,20 24,12' fill='%23F8C630' stroke='%23E55934' stroke-width='1.5'/%3E%3Cline x1='0' y1='12' x2='22' y2='12' stroke='%23E55934' stroke-width='1.5'/%3E%3Cline x1='38' y1='12' x2='60' y2='12' stroke='%23E55934' stroke-width='1.5'/%3E%3C/svg%3E");
-  background-repeat: repeat-x;
+  height: 32px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 32'%3E%3Ccircle cx='50' cy='16' r='8' fill='%23F8C630' stroke='%23E55934' stroke-width='2'/%3E%3Cpolygon points='50,8 56,16 50,24 44,16' fill='%23C03221'/%3E%3Cline x1='0' y1='16' x2='38' y2='16' stroke='%23E55934' stroke-width='2'/%3E%3Cline x1='62' y1='16' x2='100' y2='16' stroke='%23E55934' stroke-width='2'/%3E%3Ccircle cx='20' cy='16' r='2.5' fill='%232D9F6A'/%3E%3Ccircle cx='80' cy='16' r='2.5' fill='%232D9F6A'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
   background-position: center;
-  background-size: 60px 24px;
+  background-size: contain;
+  opacity: 0.8;
+}
+.divider-leaves {
+  margin: 1.5rem 0;
+  height: 40px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 40'%3E%3Cpath d='M0,20 Q15,5 30,20 T60,20 T90,20 T120,20 T150,20 T180,20 T200,20' stroke='%23E55934' stroke-width='2' fill='none' opacity='0.5'/%3E%3Cpath d='M40,15 Q45,8 50,15 Q55,22 60,15' stroke='%232D9F6A' stroke-width='2' fill='%232D9F6A' fill-opacity='0.3'/%3E%3Cpath d='M140,15 Q145,8 150,15 Q155,22 160,15' stroke='%232D9F6A' stroke-width='2' fill='%232D9F6A' fill-opacity='0.3'/%3E%3Ccircle cx='100' cy='20' r='6' fill='%23F8C630' stroke='%23E55934' stroke-width='1.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
   opacity: 0.7;
 }
 
@@ -329,16 +435,34 @@ h1::after {
   background: linear-gradient(90deg, var(--c-orange), var(--c-yellow), var(--c-green), var(--c-red));
 }
 
-/* ---- Cards de resultado: borda decorativa ---- */
+/* ---- Cards de resultado: estilo SELO POSTAL com bordas tracejadas ---- */
 [data-testid="stContainer"] [data-testid="stVerticalBlockBorderWrapper"] {
   position: relative;
-  background: linear-gradient(135deg, rgba(15,42,29,0.4), rgba(15,42,29,0.2)) !important;
-  border-color: var(--c-border) !important;
-  transition: all 0.2s ease;
+  background: linear-gradient(135deg, rgba(10,22,40,0.7), rgba(15,42,29,0.5)) !important;
+  border: 2px dashed rgba(248,198,48,0.25) !important;
+  border-radius: 12px !important;
+  transition: all 0.3s ease;
+  padding: 1rem !important;
 }
 [data-testid="stContainer"] [data-testid="stVerticalBlockBorderWrapper"]:hover {
-  border-color: rgba(248,198,48,0.3) !important;
-  box-shadow: var(--shadow-card-hover);
+  border-color: var(--c-yellow) !important;
+  box-shadow: var(--shadow-card-hover), 0 0 24px rgba(248,198,48,0.15);
+  transform: translateY(-2px);
+}
+/* Ornamentos nos 4 cantos dos cards (estilo selo) */
+[data-testid="stContainer"] [data-testid="stVerticalBlockBorderWrapper"]::before,
+[data-testid="stContainer"] [data-testid="stVerticalBlockBorderWrapper"]::after {
+  content: "✦";
+  position: absolute;
+  font-size: 0.9rem;
+  color: var(--c-orange);
+  opacity: 0.6;
+}
+[data-testid="stContainer"] [data-testid="stVerticalBlockBorderWrapper"]::before {
+  top: 6px; left: 10px;
+}
+[data-testid="stContainer"] [data-testid="stVerticalBlockBorderWrapper"]::after {
+  bottom: 6px; right: 10px;
 }
 
 /* ---- Status pill (durante processamento) ---- */
@@ -394,12 +518,42 @@ h1::after {
 </style>
 """, unsafe_allow_html=True)
 
+# Decoracoes tropicais fixas (palm, sol, folha, passaro flutuando nos cantos)
+st.markdown("""
+<div class="tropical-decor palm-top-right"></div>
+<div class="tropical-decor sun-bottom-left"></div>
+<div class="tropical-decor leaf-top-left"></div>
+<div class="tropical-decor bird-bottom-right"></div>
+""", unsafe_allow_html=True)
+
 st.title("🎓 Oficina de Imigrantes")
 st.caption("**Kreyòl Ayisyen** ↔ **Português** — dicionário com áudio + conversa ao vivo")
 
-# Banner de boas-vindas BR + Haiti (calor de oficina)
+# Banner de boas-vindas BR + Haiti (calor de oficina, decorado caribenho)
 st.markdown("""
 <div class="welcome-banner">
+  <svg class="welcome-deco-left" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="40" cy="40" r="14" fill="#F8C630"/>
+    <g stroke="#E55934" stroke-width="3" stroke-linecap="round">
+      <line x1="40" y1="8" x2="40" y2="18"/>
+      <line x1="40" y1="62" x2="40" y2="72"/>
+      <line x1="8" y1="40" x2="18" y2="40"/>
+      <line x1="62" y1="40" x2="72" y2="40"/>
+      <line x1="17" y1="17" x2="24" y2="24"/>
+      <line x1="56" y1="56" x2="63" y2="63"/>
+      <line x1="17" y1="63" x2="24" y2="56"/>
+      <line x1="56" y1="24" x2="63" y2="17"/>
+    </g>
+  </svg>
+  <svg class="welcome-deco-right" viewBox="0 0 60 80" xmlns="http://www.w3.org/2000/svg">
+    <rect x="28" y="40" width="4" height="40" fill="#A0522D"/>
+    <path d="M30,40 Q12,32 3,17" stroke="#2D9F6A" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M30,40 Q48,32 57,17" stroke="#2D9F6A" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M30,40 Q40,22 50,3" stroke="#2D9F6A" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M30,40 Q20,22 10,3" stroke="#2D9F6A" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <circle cx="28" cy="42" r="2.5" fill="#E55934"/>
+    <circle cx="32" cy="44" r="2.5" fill="#F8C630"/>
+  </svg>
   <div class="welcome-pt">🇧🇷 Olá, parceiro! Bem-vindo. Aqui estamos juntos pra aprender. Pode contar comigo, tô junto.</div>
   <div class="welcome-kr">🇭🇹 Bonjou, zanmi m! Byenvini lakay nou. Nou ansanm pou aprann. Konte sou mwen, mwen avèk ou.</div>
 </div>
