@@ -30,22 +30,58 @@ st.set_page_config(
     layout="wide",
 )
 
-# ===== Estilo global: moderno, fluido, mobile-friendly =====
+# ===== Estilo global: caribenho/haitiano, moderno, mobile-friendly =====
 st.markdown("""
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&family=Fraunces:wght@600;700;800;900&display=swap" rel="stylesheet">
 
 <style>
-/* ---- Tipografia & cores ---- */
+/* ---- Paleta caribenha (inspirada em arte haitiana folk) ---- */
 :root {
-  --c-pt: #60a5fa;          /* azul Brasil */
-  --c-kr: #4ade80;          /* verde Haiti */
-  --c-warm: #fb923c;        /* coral acolhimento */
-  --c-bg-soft: rgba(255,255,255,0.03);
-  --c-border: rgba(255,255,255,0.08);
-  --shadow-card: 0 4px 20px rgba(0,0,0,0.25);
-  --shadow-card-hover: 0 8px 30px rgba(0,0,0,0.35);
+  --c-orange:   #E55934;    /* laranja vivo - alegria caribenha */
+  --c-yellow:   #F8C630;    /* amarelo sol */
+  --c-green:    #2D9F6A;    /* verde Haiti */
+  --c-red:      #C03221;    /* vermelho profundo */
+  --c-cream:    #FAF3DD;    /* creme/areia */
+  --c-deep:     #0F2A1D;    /* verde escuro folha */
+
+  --c-pt:       var(--c-yellow);
+  --c-kr:       var(--c-green);
+  --c-warm:     var(--c-orange);
+
+  --c-bg-soft:  rgba(248,198,48,0.04);
+  --c-border:   rgba(250,243,221,0.10);
+  --shadow-card: 0 6px 24px rgba(15,42,29,0.35), 0 1px 0 rgba(250,243,221,0.04) inset;
+  --shadow-card-hover: 0 10px 32px rgba(15,42,29,0.45);
+}
+
+/* ---- Padroes SVG decorativos como data-URI ---- */
+.pattern-waves {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 20'%3E%3Cpath d='M0,10 Q10,0 20,10 T40,10 T60,10 T80,10' stroke='%23E55934' stroke-width='3' fill='none'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-size: 80px 20px;
+  height: 20px;
+}
+.pattern-diamonds {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpolygon points='15,2 28,15 15,28 2,15' fill='none' stroke='%23F8C630' stroke-width='2'/%3E%3Cpolygon points='15,8 22,15 15,22 8,15' fill='%23E55934'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-size: 30px 30px;
+  height: 30px;
+}
+.pattern-triangles {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 20'%3E%3Cpolygon points='0,20 10,0 20,20' fill='%232D9F6A'/%3E%3Cpolygon points='20,20 30,0 40,20' fill='%23C03221'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-size: 40px 20px;
+  height: 20px;
+}
+
+/* ---- Background sutil de toda a pagina ---- */
+.stApp {
+  background-image:
+    radial-gradient(circle at 15% 20%, rgba(229,89,52,0.05) 0%, transparent 40%),
+    radial-gradient(circle at 85% 80%, rgba(45,159,106,0.05) 0%, transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(248,198,48,0.03) 0%, transparent 60%);
 }
 html, body, [class*="css"] {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -53,6 +89,11 @@ html, body, [class*="css"] {
 h1, h2, h3, .title {
   font-family: 'Plus Jakarta Sans', sans-serif !important;
   letter-spacing: -0.02em;
+}
+h1 {
+  font-family: 'Fraunces', serif !important;
+  font-weight: 800 !important;
+  font-style: italic;
 }
 
 /* ---- Tipografia das traduções ---- */
@@ -177,43 +218,178 @@ div[data-testid="stContainer"] {
   iframe { height: 180px !important; }
 }
 
-/* ---- Sidebar: pouco mais elegante ---- */
+/* ---- Sidebar: solida no mobile (fix da transparencia) e bonita no desktop ---- */
 [data-testid="stSidebar"] {
-  background: linear-gradient(180deg, rgba(74,222,128,0.04), rgba(96,165,250,0.04));
+  background: linear-gradient(180deg, #0F2A1D 0%, #112d24 100%) !important;
+  border-right: 1px solid var(--c-border);
+  box-shadow: 8px 0 30px rgba(0,0,0,0.4);
+}
+[data-testid="stSidebar"] > div {
+  background: transparent !important;
+}
+@media (max-width: 768px) {
+  [data-testid="stSidebar"] {
+    background: linear-gradient(180deg, #0F2A1D, #1a3d2e) !important;
+    box-shadow: 6px 0 40px rgba(0,0,0,0.7) !important;
+    backdrop-filter: none !important;
+  }
+  [data-testid="stSidebar"]::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cpath d='M0,20 Q10,10 20,20 T40,20' stroke='%23E55934' stroke-width='1' fill='none' opacity='0.05'/%3E%3C/svg%3E");
+    pointer-events: none;
+  }
 }
 
-/* ---- Banner welcome: brilho sutil ---- */
+/* ---- Banner welcome: arte caribenha ---- */
 .welcome-banner {
-  background: linear-gradient(135deg, rgba(74,222,128,0.15), rgba(96,165,250,0.15));
+  position: relative;
+  background:
+    linear-gradient(135deg,
+      rgba(229,89,52,0.18) 0%,
+      rgba(248,198,48,0.10) 30%,
+      rgba(45,159,106,0.10) 70%,
+      rgba(192,50,33,0.15) 100%);
   border: 1px solid var(--c-border);
-  border-left: 6px solid var(--c-kr);
-  border-right: 6px solid var(--c-pt);
-  border-radius: 14px;
-  padding: 1.2rem 1.5rem;
+  border-radius: 16px;
+  padding: 1.6rem 1.5rem 1.4rem;
   margin: 1rem 0;
   box-shadow: var(--shadow-card);
-  animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
 }
-.welcome-pt { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.4rem; color: #f1f5f9; }
-.welcome-kr { font-size: 1.25rem; font-weight: 600; color: var(--c-kr); }
+.welcome-banner::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 6px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 6'%3E%3Crect width='10' height='6' fill='%23E55934'/%3E%3Crect x='10' width='10' height='6' fill='%23F8C630'/%3E%3Crect x='20' width='10' height='6' fill='%232D9F6A'/%3E%3Crect x='30' width='10' height='6' fill='%23C03221'/%3E%3C/svg%3E");
+  background-size: 40px 6px;
+}
+.welcome-banner::after {
+  content: "";
+  position: absolute;
+  bottom: 0; left: 0; right: 0; height: 8px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 8'%3E%3Cpath d='M0,4 Q10,0 20,4 T40,4 T60,4 T80,4' stroke='%23F8C630' stroke-width='1.5' fill='none' opacity='0.6'/%3E%3C/svg%3E");
+  background-size: 80px 8px;
+  background-repeat: repeat-x;
+}
+.welcome-pt {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #FAF3DD;
+  position: relative;
+  padding-left: 1.8rem;
+}
+.welcome-pt::before {
+  content: "🇧🇷";
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+.welcome-kr {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--c-yellow);
+  position: relative;
+  padding-left: 1.8rem;
+}
+.welcome-kr::before {
+  content: "🇭🇹";
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+/* ---- Divider decorativo entre secoes ---- */
+.divider-haiti {
+  margin: 2rem 0;
+  height: 24px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 24'%3E%3Cpolygon points='30,4 36,12 30,20 24,12' fill='%23F8C630' stroke='%23E55934' stroke-width='1.5'/%3E%3Cline x1='0' y1='12' x2='22' y2='12' stroke='%23E55934' stroke-width='1.5'/%3E%3Cline x1='38' y1='12' x2='60' y2='12' stroke='%23E55934' stroke-width='1.5'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-position: center;
+  background-size: 60px 24px;
+  opacity: 0.7;
+}
+
+/* ---- Decoracao do titulo principal ---- */
+h1 {
+  position: relative;
+  padding-bottom: 0.4rem;
+  margin-bottom: 0.2rem !important;
+}
+h1::after {
+  content: "";
+  display: block;
+  height: 6px;
+  width: 80px;
+  margin-top: 0.6rem;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--c-orange), var(--c-yellow), var(--c-green), var(--c-red));
+}
+
+/* ---- Cards de resultado: borda decorativa ---- */
+[data-testid="stContainer"] [data-testid="stVerticalBlockBorderWrapper"] {
+  position: relative;
+  background: linear-gradient(135deg, rgba(15,42,29,0.4), rgba(15,42,29,0.2)) !important;
+  border-color: var(--c-border) !important;
+  transition: all 0.2s ease;
+}
+[data-testid="stContainer"] [data-testid="stVerticalBlockBorderWrapper"]:hover {
+  border-color: rgba(248,198,48,0.3) !important;
+  box-shadow: var(--shadow-card-hover);
+}
 
 /* ---- Status pill (durante processamento) ---- */
 .status-pill {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.4rem 0.9rem;
+  gap: 0.6rem;
+  padding: 0.5rem 1rem;
   border-radius: 999px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  background: var(--c-bg-soft);
-  border: 1px solid var(--c-border);
+  font-size: 0.95rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, rgba(229,89,52,0.15), rgba(248,198,48,0.10));
+  border: 1px solid rgba(248,198,48,0.25);
+  color: var(--c-cream);
+  animation: slideUpFade 0.3s ease;
 }
 .status-dot {
-  width: 8px; height: 8px;
+  width: 10px; height: 10px;
   border-radius: 50%;
-  background: var(--c-warm);
+  background: var(--c-orange);
+  box-shadow: 0 0 12px var(--c-orange);
   animation: pulse 1s ease-in-out infinite;
+}
+
+/* ---- Footer com motivo Caribbean ---- */
+.caribbean-footer {
+  margin-top: 2.5rem;
+  padding: 1rem 0 0.5rem;
+  text-align: center;
+  opacity: 0.7;
+}
+.caribbean-footer::before {
+  content: "";
+  display: block;
+  height: 18px;
+  margin: 0 auto 0.5rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 18'%3E%3Ccircle cx='10' cy='9' r='4' fill='%23E55934'/%3E%3Ccircle cx='30' cy='9' r='4' fill='%23F8C630'/%3E%3Ccircle cx='50' cy='9' r='4' fill='%232D9F6A'/%3E%3Ccircle cx='70' cy='9' r='4' fill='%23C03221'/%3E%3Ccircle cx='90' cy='9' r='4' fill='%23FAF3DD'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100px 18px;
+}
+
+/* ---- Sentimentos / botoes em modo imigrante: cores rotativas caribenhas ---- */
+.stTabs [data-baseweb="tab-panel"] .stButton:nth-child(3n+1) > button {
+  border-left: 3px solid var(--c-orange) !important;
+}
+.stTabs [data-baseweb="tab-panel"] .stButton:nth-child(3n+2) > button {
+  border-left: 3px solid var(--c-yellow) !important;
+}
+.stTabs [data-baseweb="tab-panel"] .stButton:nth-child(3n+3) > button {
+  border-left: 3px solid var(--c-green) !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -431,7 +607,7 @@ with tab_imigrante:
             unsafe_allow_html=True,
         )
 
-    st.markdown("---")
+    st.markdown("<div class='divider-haiti'></div>", unsafe_allow_html=True)
     st.markdown("### 🔘 Fraz ki itil")
     st.caption("Klike sou youn pou montre pwofesè a sa w vle di")
 
@@ -477,7 +653,7 @@ with tab_imigrante:
         st.caption(f"🇭🇹 {kr_sel}")
 
     # ----- Seção "Sentimentos" pro imigrante expressar sem precisar saber PT -----
-    st.markdown("---")
+    st.markdown("<div class='divider-haiti'></div>", unsafe_allow_html=True)
     st.markdown("### 💚 Kòman ou santi ou? (Como você está se sentindo?)")
     st.caption("Klike yon sa a pou di pwofesè a ki jan ou ye")
 
@@ -498,3 +674,11 @@ with tab_imigrante:
             if st.button(kr, key=f"sent_{i}", use_container_width=True):
                 st.session_state.im_selected = (kr, pt)
                 st.rerun()
+
+# ===== Footer caribenho em todas as paginas =====
+st.markdown("""
+<div class="caribbean-footer">
+  <small>🇧🇷 Oficina de Imigrantes &middot; Kreyòl ↔ Português &middot; 🇭🇹</small><br>
+  <small style="opacity:0.6">Konte sou mwen, mwen avèk ou</small>
+</div>
+""", unsafe_allow_html=True)
