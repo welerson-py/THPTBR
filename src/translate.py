@@ -8,7 +8,7 @@ from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 
 from config import NLLB_MODEL, NLLB_SRC, NLLB_TGT
 from correcoes import get_pt_to_kr, get_kr_to_pt
-from idiomas import aplicar_reescrita, get_cultural_kr
+from idiomas import aplicar_reescrita, get_cultural_kr, aplicar_calor
 
 
 @lru_cache(maxsize=1)
@@ -69,6 +69,8 @@ def pt_to_kr(text: str) -> str:
     cultural = get_cultural_kr(text)
     if cultural:
         return cultural
-    # Camada 3: reescrita de idiomatismos antes de mandar pro NLLB
+    # Camada 3: reescrita de idiomatismos PT->PT literal antes do NLLB
     rewritten = aplicar_reescrita(text)
-    return _translate(rewritten, "por_Latn", "hat_Latn")
+    raw = _translate(rewritten, "por_Latn", "hat_Latn")
+    # Camada 4: pós-processamento de calor humano (técnico -> acolhedor)
+    return aplicar_calor(raw)

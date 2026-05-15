@@ -131,6 +131,27 @@ IDIOMA_REWRITES = {
     "comidinha": "comida",
     "cafezinho": "café",
 
+    # --- Gauchismos / regionalismos do Sul ---
+    "tri bom": "muito bom",
+    "tri legal": "muito legal",
+    "tri bem": "muito bem",
+    "bah": "puxa",
+    "bah tchê": "puxa",
+    "tchê": "cara",
+    "te fresqueia": "te preocupes",
+    "se fresqueia": "se preocupa",
+    "não te fresqueia": "não te preocupes",
+    "nao te fresqueia": "não te preocupes",
+    "feito o carreto": "terminamos",
+    "barbaridade": "incrível",
+    "negada": "pessoal",
+    "guri": "menino",
+    "guria": "menina",
+    "guarida": "abrigo",
+    "vivendo na fronteira": "perto de outro país",
+    "tropeço": "erro",
+    "topete": "ousadia",
+
     # --- Outros comuns ---
     "ué": "",  # interjeição sem tradução
     "né": "não é",
@@ -198,7 +219,87 @@ IDIOMA_CULTURAL = {
     "tchau": "Orevwa",
     "até mais": "N a wè pita",
     "falou": "Orevwa",
+
+    # ============================================================
+    # CALOR DE OFICINA: acolhimento, incentivo, celebração
+    # ============================================================
+    # Sucesso / celebração
+    "muito bem você conseguiu": "Ala bèl sa bèl, ou reyalize l!",
+    "muito bem voce conseguiu": "Ala bèl sa bèl, ou reyalize l!",
+    "tri bom você conseguiu": "Ala bèl sa bèl, ou reyalize l!",
+    "tri bom voce conseguiu": "Ala bèl sa bèl, ou reyalize l!",
+    "parabéns": "Konpliman!",
+    "parabens": "Konpliman!",
+    "parabéns você conseguiu": "Konpliman! Ou reyalize l!",
+    "parabens voce conseguiu": "Konpliman! Ou reyalize l!",
+    "você é demais": "Ou ekstraòdinè!",
+    "voce e demais": "Ou ekstraòdinè!",
+    "você está indo bem": "Ou ap mache byen anpil",
+    "voce esta indo bem": "Ou ap mache byen anpil",
+
+    # Incentivo / acolhimento
+    "não desiste": "Pa janm dekouraje",
+    "nao desiste": "Pa janm dekouraje",
+    "não desista": "Pa janm dekouraje",
+    "nao desista": "Pa janm dekouraje",
+    "tenta de novo": "Eseye ankò",
+    "tenta de novo eu tô com você": "Pa pè, eseye ankò. M la avèk ou.",
+    "tenta de novo eu to com voce": "Pa pè, eseye ankò. M la avèk ou.",
+    "não te fresqueia tenta de novo": "Pa pè, eseye ankò. M la avèk ou.",
+    "nao te fresqueia tenta de novo": "Pa pè, eseye ankò. M la avèk ou.",
+    "fica tranquilo vai dar certo": "Pa enkyete w, tout bagay ap mache byen",
+    "vai dar tudo certo": "Tout bagay ap mache byen",
+    "estamos juntos": "Nou ansanm",
+    "vamos juntos": "Annou ansanm",
+    "tô com você": "M la avèk ou",
+    "to com voce": "M la avèk ou",
+    "estou com você": "M la avèk ou",
+    "estou aqui": "Mwen la avèk ou",
+    "calma": "Pa enkyete w",
+    "fica calmo": "Pa enkyete w",
+
+    # Finalização carinhosa
+    "feito o carreto": "Travay la fini, nou fè yon bèl travay!",
+    "terminamos": "Travay la fini, nou fè yon bèl travay!",
+    "acabamos": "Travay la fini, nou fè yon bèl travay!",
+    "missão cumprida": "Misyon akonpli!",
+    "missao cumprida": "Misyon akonpli!",
+
+    # Boas-vindas
+    "bem-vindo": "Byenvini lakay nou",
+    "bem vindo": "Byenvini lakay nou",
+    "seja bem-vindo": "Byenvini lakay nou",
+    "seja bem vindo": "Byenvini lakay nou",
+    "estamos felizes de ter você aqui": "Nou kontan ou la avèk nou",
 }
+
+
+# ============================================================
+# 3. CALOR PÓS-NLLB (output kreyòl muito "técnico" -> versão acolhedora)
+# ============================================================
+# Quando o NLLB devolve uma tradução correta mas fria, substitui por uma versão
+# culturalmente mais quente, usando gírias/expressões que aproximam o falante.
+
+WARMTH_KR = [
+    # ("regex caso-insensitivo no output do NLLB", "substituicao calorosa")
+    (r"\bse trè fasil\b", "se dlo kòk"),         # "é muito fácil" -> "é água de coco" (gíria)
+    (r"\btrè fasil\b", "dlo kòk"),               # "muito fácil" -> "água de coco"
+    (r"\bfasil anpil\b", "dlo kòk"),             # "fácil demais" -> "água de coco"
+    (r"\bsa bon\b", "sa bèl anpil"),             # "está bom" -> "está muito bonito"
+    (r"\bli bon\b", "li bèl anpil"),             # "está bom" (3a pess) -> idem
+    (r"\bmwen kontan\b", "kè m kontan"),         # "estou feliz" -> "meu coração está feliz" (mais quente)
+]
+
+
+def aplicar_calor(kr_text: str) -> str:
+    """Pós-processa output do NLLB pra dar um toque cultural caloroso.
+    Substitui frases técnicas por equivalentes mais acolhedores em kreyòl."""
+    if not kr_text:
+        return kr_text
+    out = kr_text
+    for pattern, warm in WARMTH_KR:
+        out = re.sub(pattern, warm, out, flags=re.IGNORECASE)
+    return out
 
 
 # Pre-compute normalized lookups (key sem acentos -> valor)
