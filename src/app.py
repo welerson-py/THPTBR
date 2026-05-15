@@ -3,10 +3,46 @@ import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
+import io
+import socket
 import streamlit as st
 import streamlit.components.v1 as components
 
 from embed_store import search, count
+
+
+@st.cache_data
+def _get_local_url():
+    """Discover LAN IP for QR code (so phones can scan to connect)."""
+    try:
+        # Open dummy socket to discover routing IP
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        ip = s.getsockname()[0]
+        s.close()
+        # Check if we're running with SSL by looking for cert
+        from pathlib import Path
+        cert = Path(__file__).resolve().parent.parent / "certs" / "cert.pem"
+        scheme = "https" if cert.exists() else "http"
+        return f"{scheme}://{ip}:8501"
+    except Exception:
+        return None
+
+
+@st.cache_data
+def _make_qr_png(url: str) -> bytes:
+    """Generate QR code PNG bytes for a URL."""
+    try:
+        import qrcode
+        qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_M, box_size=8, border=2)
+        qr.add_data(url)
+        qr.make(fit=True)
+        img = qr.make_image(fill_color="#F8C630", back_color="#061224")
+        buf = io.BytesIO()
+        img.save(buf, format="PNG")
+        return buf.getvalue()
+    except Exception:
+        return b""
 
 
 @st.cache_resource(show_spinner="Carregando modelos (1x, ~30s)...")
@@ -616,6 +652,18 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 with st.sidebar:
+    # QR code pra celulares na mesma rede conectarem
+    local_url = _get_local_url()
+    if local_url:
+        st.markdown("### 📱 Conecta o celular")
+        qr_png = _make_qr_png(local_url)
+        if qr_png:
+            st.image(qr_png, caption=local_url, use_container_width=True)
+        else:
+            st.code(local_url)
+        st.caption("Mesma WiFi do note. Aceite o aviso de certificado na 1ª vez.")
+        st.markdown("---")
+
     st.header("⚙️ Configurações")
     n_results = st.slider("Resultados por busca", 3, 20, 8)
     show_score = st.checkbox("Mostrar score técnico", value=False)
@@ -628,7 +676,8 @@ with st.sidebar:
     st.markdown("**Atalhos de uso:**")
     st.markdown(
         "- **Dicionário**: busca rápida de palavras\n"
-        "- **Conversa**: microfone pra falar ao vivo com o imigrante"
+        "- **Conversa**: microfone pra falar ao vivo com o imigrante\n"
+        "- **Mòd Imigran**: passa o celular pro haitiano"
     )
 
 tab_dic, tab_conversa, tab_imigrante = st.tabs([

@@ -18,6 +18,12 @@ data/tts_cache/
 # Downloaded models (~4 GB)
 models/
 
+# Local HTTPS certs (gerados via mkcert, especificos da maquina)
+certs/
+
+# Bundles compartilhaveis
+oficina-bundle-*.zip
+
 # Model caches (HuggingFace downloads to ~/.cache by default)
 .cache/
 hf_cache/
