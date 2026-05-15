@@ -8,6 +8,22 @@ import streamlit.components.v1 as components
 
 from embed_store import search, count
 
+
+@st.cache_resource(show_spinner="Carregando modelos (1x, ~30s)...")
+def warmup_models():
+    """Pre-load all models so first user interaction is fast."""
+    from tts import warmup as tts_warmup
+    from conversa import _whisper_pt
+    from translate import get_model as nllb_model
+    # Order matters: lightest first so something's ready ASAP
+    nllb_model()
+    _whisper_pt()
+    tts_warmup()
+    return True
+
+
+warmup_models()
+
 st.set_page_config(
     page_title="Oficina de Imigrantes — Kreyòl ↔ Português",
     page_icon="🎓",
@@ -42,7 +58,11 @@ with st.sidebar:
         "- **Conversa**: microfone pra falar ao vivo com o imigrante"
     )
 
-tab_dic, tab_conversa = st.tabs(["📚 Dicionário", "🎙️ Conversa ao vivo"])
+tab_dic, tab_conversa, tab_imigrante = st.tabs([
+    "📚 Dicionário",
+    "🎙️ Conversa ao vivo",
+    "🤝 Mòd Imigran",
+])
 
 # ----------------- DICIONÁRIO -----------------
 with tab_dic:
@@ -143,3 +163,79 @@ with tab_conversa:
         "💡 **Dica:** quanto mais perto o microfone, melhor. Headset USB ajuda muito em sala cheia. "
         "Primeira gravação demora ~30s (carrega modelo). Depois fica rápido (3-6s por turno)."
     )
+
+# ----------------- MODO IMIGRANTE -----------------
+# Tab dedicada pro imigrante haitiano. Idioma de UI = kreyòl.
+# Botão grande pra falar, frases comuns prontas pra mostrar pro voluntário.
+with tab_imigrante:
+    st.markdown("""
+    <style>
+    .imigrante-title { font-size: 2rem; font-weight: 700; }
+    .imigrante-display { font-size: 3rem; font-weight: 700; line-height: 1.2; padding: 1rem; border-radius: 0.5rem; }
+    .imigrante-kr { background: rgba(74,222,128,0.1); border-left: 6px solid #4ade80; }
+    .imigrante-pt { background: rgba(96,165,250,0.1); border-left: 6px solid #60a5fa; }
+    .stButton > button { font-size: 1.2rem; padding: 0.8rem 1rem; height: auto; min-height: 3.5rem; }
+    </style>
+    """, unsafe_allow_html=True)
+
+    st.markdown("<div class='imigrante-title'>🤝 Bonjou! Klike pou pale</div>", unsafe_allow_html=True)
+    st.caption("Pale an kreyòl, n ap ekri sa ou di an pòtigè pou pwofesè a")
+
+    kr_audio_im = st.audio_input("🎙️ Pale isi a:", key="im_input")
+    if kr_audio_im:
+        with st.spinner("Tande... (MMS + tradiksyon)"):
+            from conversa import kr_says_to_pt
+            result = kr_says_to_pt(kr_audio_im.getvalue())
+        st.markdown(
+            f"<div class='imigrante-display imigrante-kr'>🇭🇹 {result['kr'] or '(silans)'}</div>",
+            unsafe_allow_html=True,
+        )
+        st.markdown(
+            f"<div class='imigrante-display imigrante-pt'>🇧🇷 {result['pt'] or '(pa ka tradui)'}</div>",
+            unsafe_allow_html=True,
+        )
+
+    st.markdown("---")
+    st.markdown("### 🔘 Fraz ki itil")
+    st.caption("Klike sou youn pou montre pwofesè a sa w vle di")
+
+    # Frases pré-mapeadas pra mostrar PT direto sem precisar gravar
+    QUICK_PHRASES = [
+        ("Mwen pa konprann", "Eu não entendo"),
+        ("Èske w ka repete?", "Pode repetir?"),
+        ("Pale pi dousman", "Fale mais devagar"),
+        ("Mwen pa konnen", "Eu não sei"),
+        ("Èd mwen tanpri", "Me ajude por favor"),
+        ("Mwen vle aprann", "Eu quero aprender"),
+        ("Mwen pèdi", "Estou perdido"),
+        ("Klike kote?", "Onde clico?"),
+        ("Ki bouton?", "Qual botão?"),
+        ("Mwen pa wè", "Eu não vejo"),
+        ("Mèsi anpil", "Muito obrigado"),
+        ("Pi vit tanpri", "Mais rápido por favor"),
+        ("Mwen pare", "Estou pronto"),
+        ("Mwen fini", "Eu terminei"),
+        ("Mwen grangou", "Estou com fome"),
+        ("Mwen swaf", "Estou com sede"),
+        ("Ki kote twalèt?", "Onde é o banheiro?"),
+        ("Ki lè li ye?", "Que horas são?"),
+    ]
+
+    if "im_selected" not in st.session_state:
+        st.session_state.im_selected = None
+
+    cols = st.columns(3)
+    for i, (kr, pt) in enumerate(QUICK_PHRASES):
+        with cols[i % 3]:
+            if st.button(kr, key=f"qp_{i}", use_container_width=True):
+                st.session_state.im_selected = (kr, pt)
+
+    if st.session_state.im_selected:
+        kr_sel, pt_sel = st.session_state.im_selected
+        st.markdown("---")
+        st.markdown("### 👉 Montre sa pwofesè a:")
+        st.markdown(
+            f"<div class='imigrante-display imigrante-pt'>🇧🇷 {pt_sel}</div>",
+            unsafe_allow_html=True,
+        )
+        st.caption(f"🇭🇹 {kr_sel}")

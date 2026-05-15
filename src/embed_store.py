@@ -47,11 +47,8 @@ def upsert(records: Iterable[dict]):
     get_collection().upsert(ids=ids, documents=docs, metadatas=metas, embeddings=embs)
 
 
-def search(query: str, n: int = 5, alpha: float = 0.55) -> list[dict]:
-    """Hybrid search: vector similarity + fuzzy text match on kreyol/portuguese fields.
-
-    alpha = weight of vector score vs fuzzy score (0.55 = slightly favor vector).
-    Pulls top 30 vector candidates, re-ranks with fuzzy boost on kr+pt fields."""
+def _search_single(query: str, n: int, alpha: float) -> list[dict]:
+    """One pass of vector + fuzzy search for a given query string."""
     q = query.strip()
     if not q:
         return []
@@ -78,7 +75,65 @@ def search(query: str, n: int = 5, alpha: float = 0.55) -> list[dict]:
             "start": m["start"],
             "end": m["end"],
             "context": m.get("context", ""),
+            "id": f"{m['video_id']}_{m['start']}",
         })
+    return out
+
+
+def _looks_portuguese(q: str) -> bool:
+    """Cheap heuristic: does this query look like Portuguese or kreyol?"""
+    ql = q.lower().strip()
+    if any(c in ql for c in "çãáâàéêíóôõú"):
+        return True
+    # Common short PT words
+    if ql in {"sim", "não", "muito", "obrigado", "com", "para", "que", "isso", "esse", "essa", "como", "onde", "quando", "porque"}:
+        return True
+    # PT infinitives
+    if len(ql) >= 4 and ql.endswith(("ar", "er", "ir", "ção")):
+        return True
+    # KR signals
+    if any(c in ql for c in "èòìù"):
+        return False
+    if ql.startswith(("ki ", "èske", "mwen ", "ou ", "li ", "kòm", "ou pa")):
+        return False
+    if ql in {"wi", "non", "mèsi", "mesi", "tanpri", "manje", "bwè", "ale", "achte", "konprann"}:
+        return False
+    return True  # default to PT (most common)
+
+
+def search(query: str, n: int = 5, alpha: float = 0.55, bidirectional: bool = True) -> list[dict]:
+    """Hybrid search: vector + fuzzy match. If bidirectional, also tries the
+    NLLB-translated query in the other language and merges results.
+
+    This is critical for kreyol queries — the embedder doesn't know kreyol well,
+    but if we translate 'achte' -> 'comprar' first, search hits much harder."""
+    q = query.strip()
+    if not q:
+        return []
+
+    results_map = {}
+    for r in _search_single(q, n, alpha):
+        results_map[r["id"]] = r
+
+    if bidirectional:
+        try:
+            from translate import kr_to_pt, pt_to_kr
+            if _looks_portuguese(q):
+                translated = pt_to_kr(q)
+            else:
+                translated = kr_to_pt(q)
+            if translated and translated.strip().lower() != q.lower():
+                for r in _search_single(translated, n, alpha):
+                    # If same record found again, keep the higher score
+                    if r["id"] in results_map:
+                        if r["score"] > results_map[r["id"]]["score"]:
+                            results_map[r["id"]] = r
+                    else:
+                        results_map[r["id"]] = r
+        except Exception:
+            pass  # if translation fails for any reason, fall back to single-side search
+
+    out = list(results_map.values())
     out.sort(key=lambda r: -r["score"])
     return out[:n]
 

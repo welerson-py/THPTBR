@@ -1,3 +1,5 @@
 # Uma URL por linha. Pode ser vídeo individual OU playlist.
 # Linhas começando com # são ignoradas.
 https://www.youtube.com/playlist?list=PLIXElUh0YQVnpdKc5N1Euqzm4f7pwtdEc
+# Centre d'Accueil Universel au Brésil à São Paulo
+https://www.youtube.com/playlist?list=PLkZY0N_w6R2SGGGUd5c1d5IIiJmfN5ej1

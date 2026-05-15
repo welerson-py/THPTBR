@@ -55,23 +55,36 @@ def get_pending_urls() -> list[str]:
 
 def run_once() -> int:
     pending = get_pending_urls()
-    print(f"[daemon] {len(pending)} URLs pendentes")
+    print(f"[daemon] {len(pending)} URLs pendentes", flush=True)
     done = 0
+    consecutive_dl_fails = 0
     for url in pending:
         vid = video_id(url)
-        print(f"\n[daemon] >>> {vid}")
+        print(f"\n[daemon] >>> {vid}", flush=True)
         try:
             r = process_url(url)
-            if r.get("status") == "ok":
+            status = r.get("status")
+            if status == "ok":
                 append_line(PROCESSED_FILE, vid)
                 done += 1
+                consecutive_dl_fails = 0
+            elif status == "download_failed":
+                # Treat as transient — could be offline. Don't mark as failed,
+                # next run retries. Stop the daemon after 3 in a row to save resources.
+                consecutive_dl_fails += 1
+                print(f"[daemon] download falhou (possivel offline). Tentativas seguidas: {consecutive_dl_fails}/3", flush=True)
+                if consecutive_dl_fails >= 3:
+                    print("[daemon] 3 downloads seguidos falharam — assumindo offline. Saindo (rode novamente quando voltar online).", flush=True)
+                    break
             else:
-                append_line(FAILED_FILE, f"{vid}\t{r.get('status', 'unknown')}")
+                append_line(FAILED_FILE, f"{vid}\t{status or 'unknown'}")
+                consecutive_dl_fails = 0
         except KeyboardInterrupt:
             raise
         except Exception as e:
-            print(f"[daemon] ERRO em {vid}: {e}")
+            print(f"[daemon] ERRO em {vid}: {e}", flush=True)
             append_line(FAILED_FILE, f"{vid}\tEXCEPTION: {e}")
+            consecutive_dl_fails = 0
     return done
 
 

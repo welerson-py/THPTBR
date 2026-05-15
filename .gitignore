@@ -13,6 +13,7 @@ data/chroma/
 data/processed.txt
 data/failed.txt
 data/tts_test.wav
+data/tts_cache/
 
 # Downloaded models (~4 GB)
 models/

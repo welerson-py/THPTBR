@@ -1,0 +1,29 @@
+{
+  "pt_to_kr": {
+    "não": "Non",
+    "nao": "Non",
+    "você tem sede?": "Èske w gen swaf?",
+    "voce tem sede?": "Èske w gen swaf?",
+    "está com sede?": "Èske w gen swaf?",
+    "olá": "Bonjou",
+    "ola": "Bonjou",
+    "tchau": "Orevwa"
+  },
+  "kr_to_pt": {
+    "non": "Não",
+    "wi": "Sim",
+    "mèsi": "Obrigado",
+    "mesi": "Obrigado",
+    "tanpri": "Por favor",
+    "mwen pa konprann": "Eu não entendo",
+    "mwen pa konnen": "Eu não sei",
+    "èd mwen tanpri": "Me ajude por favor",
+    "ed mwen tanpri": "Me ajude por favor",
+    "mwen vle aprann": "Eu quero aprender",
+    "mwen rele": "Meu nome é",
+    "kòman ou ye": "Como você está",
+    "koman ou ye": "Como você está",
+    "bonjou": "Bom dia",
+    "bonswa": "Boa noite"
+  }
+}

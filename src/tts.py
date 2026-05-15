@@ -6,15 +6,17 @@ import os
 os.environ.setdefault("HF_HUB_DISABLE_SYMLINKS", "1")
 os.environ.setdefault("HF_HUB_DISABLE_SYMLINKS_WARNING", "1")
 
+import hashlib
 import io
 from functools import lru_cache
+from pathlib import Path
 
 import numpy as np
 import torch
 from transformers import VitsModel, AutoTokenizer
 
+from config import TTS_CACHE_DIR
 
-from pathlib import Path
 TTS_HAT_REPO = "facebook/mms-tts-hat"
 TTS_LOCAL = Path(__file__).resolve().parent.parent / "models" / "mms-tts-hat"
 
@@ -46,9 +48,14 @@ def synth_kreyol(text: str) -> tuple[np.ndarray, int]:
 
 
 def synth_kreyol_wav_bytes(text: str) -> bytes:
-    """Same as synth_kreyol but returns WAV bytes (for Streamlit st.audio)."""
+    """Same as synth_kreyol but returns WAV bytes (for Streamlit st.audio).
+    Disk-cached by text hash — repeated phrases (very common in workshops)
+    are instant on second call. Cache lives in data/tts_cache/."""
+    key = hashlib.sha256(text.strip().encode("utf-8")).hexdigest()[:16]
+    cache_file = TTS_CACHE_DIR / f"{key}.wav"
+    if cache_file.exists() and cache_file.stat().st_size > 100:
+        return cache_file.read_bytes()
     audio, sr = synth_kreyol(text)
-    # Convert to int16 WAV
     import wave
     int16 = (audio * 32767).astype(np.int16)
     buf = io.BytesIO()
@@ -57,7 +64,17 @@ def synth_kreyol_wav_bytes(text: str) -> bytes:
         wf.setsampwidth(2)
         wf.setframerate(sr)
         wf.writeframes(int16.tobytes())
-    return buf.getvalue()
+    data = buf.getvalue()
+    try:
+        cache_file.write_bytes(data)
+    except OSError:
+        pass
+    return data
+
+
+def warmup():
+    """Pre-load model so first user click doesn't wait. Call at app startup."""
+    get_tts_hat()
 
 
 if __name__ == "__main__":
