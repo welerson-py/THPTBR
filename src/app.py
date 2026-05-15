@@ -42,6 +42,20 @@ st.markdown("""
 st.title("🎓 Oficina de Imigrantes")
 st.caption("**Kreyòl Ayisyen** ↔ **Português** — dicionário com áudio + conversa ao vivo")
 
+# Banner de boas-vindas RS + Haiti (calor de oficina)
+st.markdown("""
+<div style="background: linear-gradient(135deg, rgba(74,222,128,0.12), rgba(96,165,250,0.12));
+            border-left: 6px solid #4ade80; border-right: 6px solid #60a5fa;
+            border-radius: 0.5rem; padding: 1rem 1.5rem; margin: 1rem 0;">
+  <div style="font-size: 1.3rem; font-weight: 600; margin-bottom: 0.5rem;">
+    🇧🇷 Olá, parceiro! Bem-vindo. Aqui estamos juntos pra aprender. Não te fresqueia, tô contigo.
+  </div>
+  <div style="font-size: 1.3rem; font-weight: 600; color: #4ade80;">
+    🇭🇹 Bonjou, zanmi m! Byenvini lakay nou. Nou ansanm pou aprann. Pa pè, m la avèk ou.
+  </div>
+</div>
+""", unsafe_allow_html=True)
+
 with st.sidebar:
     st.header("⚙️ Configurações")
     n_results = st.slider("Resultados por busca", 3, 20, 8)
@@ -239,3 +253,26 @@ with tab_imigrante:
             unsafe_allow_html=True,
         )
         st.caption(f"🇭🇹 {kr_sel}")
+
+    # ----- Seção "Sentimentos" pro imigrante expressar sem precisar saber PT -----
+    st.markdown("---")
+    st.markdown("### 💚 Kòman ou santi ou? (Como você está se sentindo?)")
+    st.caption("Klike yon sa a pou di pwofesè a ki jan ou ye")
+
+    SENTIMENTOS = [
+        ("😊 Mwen kontan", "Estou feliz"),
+        ("😟 Mwen pa fin konprann", "Não estou entendendo bem"),
+        ("😰 Mwen pè", "Estou com medo"),
+        ("😣 Mwen fatige", "Estou cansado"),
+        ("🤔 M ap reflechi", "Estou pensando"),
+        ("👍 M pare", "Estou pronto"),
+        ("🙏 Tanpri pi dousman", "Por favor, mais devagar"),
+        ("✋ Mwen vle pran yon ti repo", "Quero fazer uma pausa"),
+        ("💪 Mwen ka fè l", "Eu consigo fazer"),
+    ]
+    cols_s = st.columns(3)
+    for i, (kr, pt) in enumerate(SENTIMENTOS):
+        with cols_s[i % 3]:
+            if st.button(kr, key=f"sent_{i}", use_container_width=True):
+                st.session_state.im_selected = (kr, pt)
+                st.rerun()
