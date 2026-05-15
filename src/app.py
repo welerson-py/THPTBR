@@ -76,15 +76,44 @@ st.markdown("""
   height: 20px;
 }
 
-/* ---- Background: navy profundo com padrao labirinto sutil + manchas quentes ---- */
+/* ---- Background: mural caribenho em 5 camadas + vignette ---- */
 .stApp {
-  background-color: #0a1628;
+  background-color: #061224;
   background-image:
-    radial-gradient(circle at 12% 18%, rgba(229,89,52,0.12) 0%, transparent 35%),
-    radial-gradient(circle at 88% 82%, rgba(45,159,106,0.12) 0%, transparent 35%),
-    radial-gradient(circle at 50% 50%, rgba(248,198,48,0.05) 0%, transparent 70%),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%23F8C630' stroke-width='1' opacity='0.04'%3E%3Cpath d='M10,10 L40,10 L40,40 L10,40 Z M50,10 L80,10 L80,40 L50,40 Z M90,10 L110,10 L110,40 L90,40 Z'/%3E%3Cpath d='M20,20 L30,20 L30,30 L20,30 Z M60,20 L70,20 L70,30 L60,30 Z M95,20 L105,20 L105,30 L95,30 Z'/%3E%3Cpath d='M10,50 L25,50 L25,70 L10,70 Z M35,50 L55,50 L55,70 L35,70 Z M65,50 L110,50 L110,70 L65,70 Z'/%3E%3Cpath d='M10,80 L60,80 L60,110 L10,110 Z M70,80 L110,80 L110,110 L70,110 Z'/%3E%3Cpath d='M75,85 L85,85 L85,95 L75,95 Z M90,90 L100,90 L100,100 L90,100 Z'/%3E%3C/g%3E%3C/svg%3E");
+    /* Layer 1: motivos tropicais grandes esparsos (palmeira, sol, folha, bird) */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='480' height='480' viewBox='0 0 480 480'%3E%3Cg opacity='0.025'%3E%3Cg transform='translate(40,60)'%3E%3Crect x='28' y='40' width='4' height='40' fill='%23F8C630'/%3E%3Cpath d='M30,40 Q12,32 3,17 M30,40 Q48,32 57,17 M30,40 Q40,22 50,3 M30,40 Q20,22 10,3' stroke='%232D9F6A' stroke-width='3' fill='none'/%3E%3C/g%3E%3Cg transform='translate(360,140)'%3E%3Ccircle cx='30' cy='30' r='12' fill='%23F8C630'/%3E%3Cg stroke='%23E55934' stroke-width='2.5'%3E%3Cline x1='30' y1='5' x2='30' y2='14'/%3E%3Cline x1='30' y1='46' x2='30' y2='55'/%3E%3Cline x1='5' y1='30' x2='14' y2='30'/%3E%3Cline x1='46' y1='30' x2='55' y2='30'/%3E%3Cline x1='12' y1='12' x2='18' y2='18'/%3E%3Cline x1='42' y1='42' x2='48' y2='48'/%3E%3Cline x1='12' y1='48' x2='18' y2='42'/%3E%3Cline x1='42' y1='18' x2='48' y2='12'/%3E%3C/g%3E%3C/g%3E%3Cg transform='translate(180,320)'%3E%3Cpath d='M20,5 Q4,15 7,30 Q11,46 20,49 Q29,46 33,30 Q36,15 20,5 Z' fill='%232D9F6A'/%3E%3C/g%3E%3Cg transform='translate(80,380)'%3E%3Cpath d='M8,25 Q14,12 26,12 Q38,12 42,24 L44,30 L42,32 L24,32 Q12,32 8,25 Z' fill='%23A050A0'/%3E%3Ccircle cx='36' cy='20' r='2' fill='%23F8C630'/%3E%3C/g%3E%3Cg transform='translate(380,360)'%3E%3Cellipse cx='20' cy='30' rx='15' ry='18' fill='%23E55934'/%3E%3Cpath d='M20,15 L25,8' stroke='%232D9F6A' stroke-width='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"),
+    /* Layer 2: labirinto haitiano (medio) inspirado na ceramica */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cg fill='none' stroke='%23F8C630' stroke-width='1.5' opacity='0.06'%3E%3Crect x='25' y='25' width='130' height='130'/%3E%3Crect x='40' y='40' width='100' height='100'/%3E%3Crect x='55' y='55' width='70' height='70'/%3E%3Crect x='70' y='70' width='40' height='40' fill='%23E55934' fill-opacity='0.15'/%3E%3Cline x1='90' y1='25' x2='90' y2='40'/%3E%3Cline x1='90' y1='140' x2='90' y2='155'/%3E%3Cline x1='25' y1='90' x2='40' y2='90'/%3E%3Cline x1='140' y1='90' x2='155' y2='90'/%3E%3C/g%3E%3C/svg%3E"),
+    /* Layer 3: pontilhado (estilo aborigene-haitiano de pottery) */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cg fill='%23FAF3DD' opacity='0.04'%3E%3Ccircle cx='5' cy='5' r='0.8'/%3E%3Ccircle cx='15' cy='10' r='0.8'/%3E%3Ccircle cx='25' cy='5' r='0.8'/%3E%3Ccircle cx='35' cy='12' r='0.8'/%3E%3Ccircle cx='10' cy='20' r='0.8'/%3E%3Ccircle cx='20' cy='25' r='0.8'/%3E%3Ccircle cx='30' cy='22' r='0.8'/%3E%3Ccircle cx='5' cy='32' r='0.8'/%3E%3Ccircle cx='18' cy='35' r='0.8'/%3E%3Ccircle cx='28' cy='32' r='0.8'/%3E%3C/g%3E%3C/svg%3E"),
+    /* Layer 4: glow quente nos cantos */
+    radial-gradient(circle at 8% 12%, rgba(229,89,52,0.18) 0%, transparent 35%),
+    radial-gradient(circle at 92% 88%, rgba(45,159,106,0.16) 0%, transparent 35%),
+    radial-gradient(circle at 70% 15%, rgba(248,198,48,0.10) 0%, transparent 40%),
+    radial-gradient(circle at 20% 85%, rgba(192,50,33,0.10) 0%, transparent 35%);
+  background-size:
+    480px 480px,    /* motivos tropicais */
+    180px 180px,    /* labirinto */
+    40px 40px,      /* pontilhado */
+    auto, auto, auto, auto;
   background-attachment: fixed;
+}
+
+/* Vignette: escurece bordas pra focar conteudo */
+.stApp::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 80% 80% at 50% 50%, transparent 50%, rgba(0,0,0,0.45) 100%);
+  z-index: 0;
+}
+
+/* Main container fica acima do vignette */
+.main, .stMain, [data-testid="stMain"] {
+  position: relative;
+  z-index: 2;
 }
 
 /* ---- Icones tropicais flutuantes (decoracao fixa nos cantos) ---- */
@@ -232,22 +261,49 @@ div[data-testid="stContainer"] {
   border: 1px solid var(--c-border);
 }
 
-/* ---- Tabs: estilo app, não browser ---- */
+/* ---- Tabs: card flutuante caribenho, separado do fundo rico ---- */
 .stTabs [data-baseweb="tab-list"] {
-  gap: 0.5rem;
-  padding: 0.3rem;
-  background: var(--c-bg-soft);
-  border-radius: 12px;
+  gap: 0.5rem !important;
+  padding: 0.6rem !important;
+  background: linear-gradient(135deg,
+    rgba(6,18,36,0.92) 0%,
+    rgba(10,22,40,0.92) 100%) !important;
+  border-radius: 16px !important;
+  border: 1px solid rgba(248,198,48,0.20);
+  box-shadow:
+    0 8px 32px rgba(0,0,0,0.4),
+    inset 0 1px 0 rgba(250,243,221,0.06);
+  position: relative;
+  overflow: visible;
+}
+/* Listra de cor no topo das tabs (estilo bandeira) */
+.stTabs [data-baseweb="tab-list"]::before {
+  content: "";
+  position: absolute;
+  top: -2px; left: 12px; right: 12px; height: 3px;
+  background: linear-gradient(90deg, var(--c-orange), var(--c-yellow), var(--c-green), var(--c-red));
+  border-radius: 2px;
 }
 .stTabs [data-baseweb="tab"] {
-  border-radius: 8px !important;
-  padding: 0.6rem 1.2rem !important;
+  border-radius: 10px !important;
+  padding: 0.7rem 1.4rem !important;
   font-weight: 600 !important;
-  transition: all 0.15s ease !important;
+  font-size: 1rem !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  border: 1px solid transparent !important;
+  color: rgba(250,243,221,0.7) !important;
+}
+.stTabs [data-baseweb="tab"]:hover {
+  background: rgba(248,198,48,0.08) !important;
+  color: var(--c-yellow) !important;
+  transform: translateY(-1px);
 }
 .stTabs [aria-selected="true"] {
-  background: linear-gradient(135deg, var(--c-pt), var(--c-kr)) !important;
-  color: white !important;
+  background: linear-gradient(135deg, var(--c-orange) 0%, var(--c-yellow) 100%) !important;
+  color: #061224 !important;
+  border-color: rgba(250,243,221,0.3) !important;
+  box-shadow: 0 4px 16px rgba(229,89,52,0.4);
+  font-weight: 700 !important;
 }
 
 /* ---- Inputs: respiráveis ---- */
