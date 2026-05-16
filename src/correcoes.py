@@ -4,14 +4,30 @@ Stored in data/correcoes.json. Keys are lowercased input text.
 Useful examples we already know:
 - PT "não" → KR "Non" (NLLB outputs "Pa gen" wrong)
 - PT "você tem sede?" → KR "Èske w gen swaf?" (NLLB outputs "tansyon" = pressão arterial)
+
+Tambem carrega data/glossario_informatica.json com ~150 termos tech curados.
 """
 import json
+import unicodedata
+from functools import lru_cache
 from pathlib import Path
 from typing import Optional
 
 from config import DATA
 
 CORRECOES_FILE = DATA / "correcoes.json"
+GLOSSARIO_FILE = DATA / "glossario_informatica.json"
+
+
+def _norm(s: str) -> str:
+    """Normalize string: strip accents, lower, strip whitespace.
+
+    Brasileiro nem sempre digita acento; Whisper as vezes perde tambem.
+    Lookups precisam ser robustos a isso."""
+    if not s:
+        return ""
+    nfkd = unicodedata.normalize("NFKD", s)
+    return "".join(c for c in nfkd if not unicodedata.combining(c)).lower().strip()
 
 _DEFAULTS = {
     "pt_to_kr": {
@@ -88,11 +104,52 @@ def _save(data: dict) -> None:
     )
 
 
+@lru_cache(maxsize=1)
+def _load_glossario() -> dict:
+    """Carrega o glossario de informatica e retorna dict plano PT->KR
+    com keys normalizadas (sem acentos, lowercase)."""
+    if not GLOSSARIO_FILE.exists():
+        return {}
+    try:
+        data = json.loads(GLOSSARIO_FILE.read_text(encoding="utf-8"))
+        flat: dict[str, str] = {}
+        for category, items in data.get("categorias", {}).items():
+            if isinstance(items, dict):
+                for pt, kr in items.items():
+                    flat[_norm(pt)] = kr
+        return flat
+    except Exception:
+        return {}
+
+
 def get_pt_to_kr(text: str) -> Optional[str]:
-    return _load()["pt_to_kr"].get(text.strip().lower())
+    """Busca tradução PT->KR em 2 fontes, em ordem:
+    1. data/correcoes.json (user corrections, prioridade maxima)
+    2. data/glossario_informatica.json (vocabulario tech curado)
+    Retorna None se nao achar — caller deve cair pra NLLB."""
+    key = _norm(text)
+    if not key:
+        return None
+    # 1. user corrections (mais alta prioridade)
+    user_ov = _load()["pt_to_kr"].get(key)
+    if user_ov:
+        return user_ov
+    # legacy: existing entries que ainda nao tem norm
+    user_ov_legacy = _load()["pt_to_kr"].get(text.strip().lower())
+    if user_ov_legacy:
+        return user_ov_legacy
+    # 2. glossario tech
+    return _load_glossario().get(key)
 
 
 def get_kr_to_pt(text: str) -> Optional[str]:
+    """KR->PT so consulta correcoes.json (glossario e unidirecional PT->KR)."""
+    key = _norm(text)
+    if not key:
+        return None
+    user_ov = _load()["kr_to_pt"].get(key)
+    if user_ov:
+        return user_ov
     return _load()["kr_to_pt"].get(text.strip().lower())
 
 
