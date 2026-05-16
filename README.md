@@ -315,7 +315,7 @@ Quem fizer `git pull` depois ganha as novas frases automaticamente na próxima e
 
 ## 🤝 Sobre o projeto
 
-Construído pra workshop de inclusão digital de imigrantes haitianos em São Paulo (2026).
+Construído pra workshop de inclusão digital de imigrantes haitianos em Canoas, RS (2026).
 
 A ideia central: **o sistema só é útil se o imigrante sentir que vocês se deram ao trabalho de entender como ele pensa**. Por isso as 4 camadas de tradução, as 100+ gírias cadastradas, o calor humano embutido. Tradução literal é só o ponto de partida — **tradução com alma** é o objetivo.
 
@@ -330,6 +330,16 @@ Esse pequeno gesto faz o imigrante sorrir e sentir que está em casa.
 ## 📝 Licença & Créditos
 
 Código sob Apache 2.0 (ver LICENSE). Construído com modelos open-source da Meta (MMS, NLLB) e OpenAI (Whisper).
+
+### Transparência sobre uso de IA
+
+A **arquitetura de back-end** (pipeline ASR + tradução + embeddings + ChromaDB + sistema de 4 camadas de tradução cultural + daemon de processamento) foi desenhada e implementada por mim.
+
+A **parte de front-end** (UI Streamlit, CSS caribenho/haitiano com SVGs decorativos, animações, tema visual, micro-interações e layout responsivo) teve assistência de **Claude (Anthropic)** como ferramenta de design e implementação visual.
+
+Toda lógica de negócio, escolha de modelos, integração de pipeline, definição de comportamento e regras de tradução cultural são autoria minha.
+
+---
 
 > *"Bonjou, zanmi m! Byenvini lakay nou."* — Olá, amigo! Bem-vindo à nossa casa.
 
