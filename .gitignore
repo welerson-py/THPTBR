@@ -15,6 +15,11 @@ data/failed.txt
 data/tts_test.wav
 data/tts_cache/
 
+# MAS: banco_frases.json e banco_embeddings.npy VAO pro git
+# (sao a fonte de verdade portavel — 12MB que populam ChromaDB automaticamente)
+!data/banco_frases.json
+!data/banco_embeddings.npy
+
 # Downloaded models (~4 GB)
 models/
 

@@ -17,7 +17,43 @@ def get_embedder() -> SentenceTransformer:
 @lru_cache(maxsize=1)
 def get_collection():
     client = chromadb.PersistentClient(path=str(CHROMA_DIR))
-    return client.get_or_create_collection(name=CHROMA_COLLECTION, metadata={"hnsw:space": "cosine"})
+    col = client.get_or_create_collection(name=CHROMA_COLLECTION, metadata={"hnsw:space": "cosine"})
+    # Auto-bootstrap: se banco estiver vazio mas tiver export no repo, importa
+    if col.count() == 0:
+        _try_bootstrap_from_export(col)
+    return col
+
+
+def _try_bootstrap_from_export(col) -> None:
+    """Se data/banco_frases.json e banco_embeddings.npy existirem, popula ChromaDB.
+
+    Permite que quem clona o repo tenha banco completo em ~5s, sem rodar daemon."""
+    import json
+    from config import DATA
+    json_file = DATA / "banco_frases.json"
+    npy_file = DATA / "banco_embeddings.npy"
+    if not (json_file.exists() and npy_file.exists()):
+        return
+    try:
+        import numpy as np
+        print(f"[bootstrap] banco vazio + export encontrado, importando...", flush=True)
+        payload = json.loads(json_file.read_text(encoding="utf-8"))
+        embs = np.load(npy_file).astype(np.float32).tolist()
+        ids = payload["ids"]
+        docs = payload["documents"]
+        metas = payload["metadatas"]
+        # Insere em batches pra nao estourar memoria em PC fraco
+        batch = 500
+        for i in range(0, len(ids), batch):
+            col.upsert(
+                ids=ids[i:i+batch],
+                documents=docs[i:i+batch],
+                metadatas=metas[i:i+batch],
+                embeddings=embs[i:i+batch],
+            )
+        print(f"[bootstrap] {len(ids)} frases importadas do export do git", flush=True)
+    except Exception as e:
+        print(f"[bootstrap] falhou (vai usar banco vazio): {e}", flush=True)
 
 
 def embed(texts: list[str]) -> list[list[float]]:
