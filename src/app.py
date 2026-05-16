@@ -609,6 +609,91 @@ h1::after {
 .stTabs [data-baseweb="tab-panel"] .stButton:nth-child(3n+3) > button {
   border-left: 3px solid var(--c-green) !important;
 }
+
+/* ---- Mode Pase Telefon: UI ultra simplificada pro imigrante ---- */
+.passa-hero {
+  font-size: 2.8rem;
+  font-weight: 800;
+  text-align: center;
+  background: linear-gradient(135deg, var(--c-yellow) 0%, var(--c-orange) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 1rem 0 0.3rem;
+  letter-spacing: -0.02em;
+  font-family: 'Fraunces', serif !important;
+  font-style: italic;
+}
+.passa-instructions {
+  font-size: 1.5rem;
+  text-align: center;
+  color: var(--c-cream);
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+}
+.passa-instructions .pt-translation {
+  display: block;
+  font-size: 0.95rem;
+  opacity: 0.55;
+  margin-top: 0.3rem;
+  font-style: italic;
+}
+.passa-result-kr {
+  font-size: 3.2rem;
+  font-weight: 700;
+  text-align: center;
+  color: #d1fae5;
+  padding: 1.8rem 1.5rem;
+  background: linear-gradient(135deg, rgba(45,159,106,0.20), rgba(45,159,106,0.06));
+  border-radius: 18px;
+  border-left: 8px solid var(--c-green);
+  border-right: 8px solid var(--c-green);
+  margin: 1.2rem 0;
+  animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: var(--shadow-card);
+  line-height: 1.15;
+}
+.passa-result-pt {
+  font-size: 2.5rem;
+  font-weight: 700;
+  text-align: center;
+  color: #fef3c7;
+  padding: 1.5rem 1.4rem;
+  background: linear-gradient(135deg, rgba(248,198,48,0.15), rgba(248,198,48,0.04));
+  border-radius: 18px;
+  border: 3px dashed rgba(248,198,48,0.5);
+  margin: 1.2rem 0;
+  animation: slideUpFade 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: var(--shadow-card);
+  line-height: 1.15;
+}
+.passa-divider-arrow {
+  text-align: center;
+  font-size: 2.5rem;
+  color: var(--c-yellow);
+  margin: 0.3rem 0;
+  animation: bounce 2s ease-in-out infinite;
+}
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(6px); }
+}
+.passa-section-label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  opacity: 0.7;
+  margin-top: 0.5rem;
+  text-align: center;
+}
+@media (max-width: 768px) {
+  .passa-hero { font-size: 2rem; }
+  .passa-instructions { font-size: 1.2rem; }
+  .passa-result-kr { font-size: 2.2rem; padding: 1.2rem; }
+  .passa-result-pt { font-size: 1.7rem; padding: 1rem; }
+  .passa-divider-arrow { font-size: 2rem; }
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -682,10 +767,11 @@ with st.sidebar:
         "- **Mòd Imigran**: passa o celular pro haitiano"
     )
 
-tab_dic, tab_conversa, tab_imigrante = st.tabs([
+tab_dic, tab_conversa, tab_imigrante, tab_passa = st.tabs([
     "📚 Dicionário",
     "🎙️ Conversa ao vivo",
     "🤝 Mòd Imigran",
+    "📱 Pase Telefòn",
 ])
 
 # ----------------- DICIONÁRIO -----------------
@@ -1012,6 +1098,89 @@ with tab_imigrante:
             if st.button(kr, key=f"sent_{i}", use_container_width=True):
                 st.session_state.im_selected = (kr, pt)
                 st.rerun()
+
+# ----------------- PASE TELEFON (Pass the phone) -----------------
+# Tab ultra-simplificada: voluntario passa o celular pro imigrante.
+# Imigrante so ve um botao gigante, grava, ve a tradução em letras enormes.
+with tab_passa:
+    st.markdown("<div class='passa-hero'>📱 Pase telefòn nan</div>", unsafe_allow_html=True)
+    st.markdown(
+        "<div class='passa-instructions'>"
+        "Klike sou bouton an pou pale"
+        "<span class='pt-translation'>(Clique no botão pra falar)</span>"
+        "</div>",
+        unsafe_allow_html=True,
+    )
+
+    # Estado especifico desta aba
+    if "passa_audio_hash" not in st.session_state:
+        st.session_state.passa_audio_hash = None
+    if "passa_result" not in st.session_state:
+        st.session_state.passa_result = None
+
+    # Mic gigante
+    passa_audio = st.audio_input(
+        "🎙️ Klike isit la pou pale",
+        key="passa_input",
+    )
+
+    if passa_audio:
+        audio_bytes = passa_audio.getvalue()
+        audio_hash = hashlib.sha1(audio_bytes).hexdigest()
+        is_new = audio_hash != st.session_state.passa_audio_hash
+        if is_new:
+            status_passa = st.empty()
+            status_passa.markdown(
+                "<div class='status-pill' style='margin: 1rem auto; display: flex; justify-content: center'>"
+                "<span class='status-dot'></span> <span>MMS ap koute…</span>"
+                "</div>",
+                unsafe_allow_html=True,
+            )
+            from conversa import kr_says_to_pt
+            result = kr_says_to_pt(audio_bytes)
+            status_passa.empty()
+            st.session_state.passa_result = result
+            st.session_state.passa_audio_hash = audio_hash
+            # Tambem registra no historico geral pra voluntario ver na aba Conversa
+            st.session_state.conv_history.insert(0, {
+                "direction": "kr_to_pt",
+                "src_text": result["kr"],
+                "tgt_text": result["pt"],
+                "wav_bytes": None,
+                "ts": time.time(),
+            })
+            st.session_state.conv_history = st.session_state.conv_history[:10]
+
+    # Mostra resultado mais recente com letras GIGANTES
+    if st.session_state.passa_result:
+        r = st.session_state.passa_result
+        st.markdown("<div class='passa-section-label'>🇭🇹 Sa ou di</div>", unsafe_allow_html=True)
+        st.markdown(
+            f"<div class='passa-result-kr'>{r['kr'] or '(silans)'}</div>",
+            unsafe_allow_html=True,
+        )
+        st.markdown("<div class='passa-divider-arrow'>↓</div>", unsafe_allow_html=True)
+        st.markdown("<div class='passa-section-label'>🇧🇷 Pwofesè a wè sa</div>", unsafe_allow_html=True)
+        st.markdown(
+            f"<div class='passa-result-pt'>{r['pt'] or '(pa ka tradui)'}</div>",
+            unsafe_allow_html=True,
+        )
+
+        # Botao pra resetar e gravar novamente
+        col_reset, _ = st.columns([1, 2])
+        with col_reset:
+            if st.button("🔄 Pale ankò (Falar de novo)", key="passa_reset", use_container_width=True):
+                st.session_state.passa_result = None
+                st.session_state.passa_audio_hash = None
+                st.rerun()
+    else:
+        # Estado inicial: instrucao visual destacada
+        st.markdown(
+            "<div style='text-align:center; opacity:0.5; margin-top:1.5rem; font-size:1.1rem'>"
+            "⬆️ Klike sou bouton anwo a pou kòmanse"
+            "</div>",
+            unsafe_allow_html=True,
+        )
 
 # ===== Footer caribenho em todas as paginas =====
 st.markdown("""
