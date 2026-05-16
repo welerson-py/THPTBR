@@ -3,8 +3,10 @@ import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
+import hashlib
 import io
 import socket
+import time
 import streamlit as st
 import streamlit.components.v1 as components
 
@@ -740,6 +742,46 @@ with tab_conversa:
         "🎙️ Grave sua fala, o sistema transcreve e traduz. Mostre a tela pro outro lado ler."
     )
 
+    # Inicializa estado da sessao
+    if "conv_history" not in st.session_state:
+        st.session_state.conv_history = []
+    if "last_pt_audio_hash" not in st.session_state:
+        st.session_state.last_pt_audio_hash = None
+    if "last_kr_audio_hash" not in st.session_state:
+        st.session_state.last_kr_audio_hash = None
+
+    # ===== HISTORICO RECENTE =====
+    if st.session_state.conv_history:
+        with st.expander(f"📜 Conversa recente ({len(st.session_state.conv_history)} turnos)", expanded=False):
+            for i, turn in enumerate(st.session_state.conv_history[:5]):
+                if turn["direction"] == "pt_to_kr":
+                    src_flag, tgt_flag, tgt_color = "🇧🇷", "🇭🇹", "var(--c-kr)"
+                    src_label, tgt_label = "Você disse", "Em kreyòl"
+                else:
+                    src_flag, tgt_flag, tgt_color = "🇭🇹", "🇧🇷", "var(--c-pt)"
+                    src_label, tgt_label = "Ele/ela disse", "Em português"
+
+                with st.container(border=True):
+                    st.markdown(
+                        f"<div class='label'>{src_flag} {src_label}</div>"
+                        f"<div style='font-size:1.3rem;font-weight:600;margin-bottom:0.4rem'>{turn['src_text'] or '(silêncio)'}</div>"
+                        f"<div class='label'>{tgt_flag} {tgt_label}</div>"
+                        f"<div style='font-size:1.3rem;font-weight:600;color:{tgt_color}'>{turn['tgt_text'] or '(traduzindo falhou)'}</div>",
+                        unsafe_allow_html=True,
+                    )
+                    if turn.get("wav_bytes"):
+                        st.audio(turn["wav_bytes"], format="audio/wav")
+                        st.caption("🔁 Clique no play pra ouvir de novo")
+
+            col_clear, _ = st.columns([1, 3])
+            with col_clear:
+                if st.button("🗑️ Limpar histórico", key="clear_history"):
+                    st.session_state.conv_history = []
+                    st.session_state.last_pt_audio_hash = None
+                    st.session_state.last_kr_audio_hash = None
+                    st.rerun()
+        st.markdown("<div class='divider-leaves'></div>", unsafe_allow_html=True)
+
     sub_pt, sub_kr = st.columns(2)
 
     # ----- 1. Você fala PT, mostra em kreyòl -----
@@ -748,38 +790,58 @@ with tab_conversa:
         st.caption("Para o imigrante entender o que você quer dizer")
         pt_audio = st.audio_input("🎙️ Gravar sua voz (PT):", key="pt_input")
         if pt_audio:
-            # Status pill com 3 estagios visuais
-            status_slot = st.empty()
-            status_slot.markdown(
-                "<div class='status-pill'><span class='status-dot'></span> "
-                "<span>✍️ Transcrevendo e traduzindo…</span></div>",
-                unsafe_allow_html=True,
-            )
-            from conversa import pt_says_to_kr
-            result = pt_says_to_kr(pt_audio.getvalue())
-            status_slot.empty()
-
-            st.markdown("<div class='label'>🇧🇷 Você disse</div>", unsafe_allow_html=True)
-            st.markdown(f"<div class='big-result'>{result['pt'] or '(silêncio)'}</div>", unsafe_allow_html=True)
-            st.markdown("<div class='label'>🇭🇹 Em kreyòl (mostre pro imigrante)</div>", unsafe_allow_html=True)
-            st.markdown(f"<div class='big-result' style='color:var(--c-kr)'>{result['kr'] or '(traduzindo falhou)'}</div>", unsafe_allow_html=True)
-
-            if result["kr"]:
-                tts_slot = st.empty()
-                tts_slot.markdown(
+            audio_bytes = pt_audio.getvalue()
+            audio_hash = hashlib.sha1(audio_bytes).hexdigest()
+            # So processa se for uma gravacao NOVA (evita duplicar historico em reruns)
+            is_new = audio_hash != st.session_state.last_pt_audio_hash
+            if is_new:
+                status_slot = st.empty()
+                status_slot.markdown(
                     "<div class='status-pill'><span class='status-dot'></span> "
-                    "<span>🔊 Gerando áudio em kreyòl…</span></div>",
+                    "<span>✍️ Transcrevendo e traduzindo…</span></div>",
                     unsafe_allow_html=True,
                 )
-                try:
-                    from tts import synth_kreyol_wav_bytes
-                    wav = synth_kreyol_wav_bytes(result["kr"])
+                from conversa import pt_says_to_kr
+                result = pt_says_to_kr(audio_bytes)
+                status_slot.empty()
+
+                wav = None
+                if result["kr"]:
+                    tts_slot = st.empty()
+                    tts_slot.markdown(
+                        "<div class='status-pill'><span class='status-dot'></span> "
+                        "<span>🔊 Gerando áudio em kreyòl…</span></div>",
+                        unsafe_allow_html=True,
+                    )
+                    try:
+                        from tts import synth_kreyol_wav_bytes
+                        wav = synth_kreyol_wav_bytes(result["kr"])
+                    except Exception as e:
+                        st.warning(f"TTS kreyòl indisponível: {e}")
                     tts_slot.empty()
-                    st.audio(wav, format="audio/wav", autoplay=True)
-                    st.caption("🔊 Áudio pra o imigrante ouvir")
-                except Exception as e:
-                    tts_slot.empty()
-                    st.warning(f"TTS kreyòl indisponível: {e}")
+
+                # Salva no historico (no topo, mais recente primeiro)
+                st.session_state.conv_history.insert(0, {
+                    "direction": "pt_to_kr",
+                    "src_text": result["pt"],
+                    "tgt_text": result["kr"],
+                    "wav_bytes": wav,
+                    "ts": time.time(),
+                })
+                # Limita historico a 10 entradas
+                st.session_state.conv_history = st.session_state.conv_history[:10]
+                st.session_state.last_pt_audio_hash = audio_hash
+
+            # Mostra o resultado mais recente (whether just processed or from history)
+            if st.session_state.conv_history and st.session_state.conv_history[0]["direction"] == "pt_to_kr":
+                latest = st.session_state.conv_history[0]
+                st.markdown("<div class='label'>🇧🇷 Você disse</div>", unsafe_allow_html=True)
+                st.markdown(f"<div class='big-result'>{latest['src_text'] or '(silêncio)'}</div>", unsafe_allow_html=True)
+                st.markdown("<div class='label'>🇭🇹 Em kreyòl (mostre pro imigrante)</div>", unsafe_allow_html=True)
+                st.markdown(f"<div class='big-result' style='color:var(--c-kr)'>{latest['tgt_text'] or '(traduzindo falhou)'}</div>", unsafe_allow_html=True)
+                if latest.get("wav_bytes"):
+                    st.audio(latest["wav_bytes"], format="audio/wav", autoplay=is_new)
+                    st.caption("🔊 Toca pra o imigrante ouvir (botão de play repete)")
 
     # ----- 2. Imigrante fala KR, você lê em PT -----
     with sub_kr:
@@ -787,20 +849,37 @@ with tab_conversa:
         st.caption("Para você entender o que ele/ela está dizendo")
         kr_audio = st.audio_input("🎙️ Pedir pro imigrante falar aqui:", key="kr_input")
         if kr_audio:
-            status_slot2 = st.empty()
-            status_slot2.markdown(
-                "<div class='status-pill'><span class='status-dot'></span> "
-                "<span>🎙️ MMS escutando kreyòl…</span></div>",
-                unsafe_allow_html=True,
-            )
-            from conversa import kr_says_to_pt
-            result = kr_says_to_pt(kr_audio.getvalue())
-            status_slot2.empty()
+            audio_bytes = kr_audio.getvalue()
+            audio_hash = hashlib.sha1(audio_bytes).hexdigest()
+            is_new = audio_hash != st.session_state.last_kr_audio_hash
+            if is_new:
+                status_slot2 = st.empty()
+                status_slot2.markdown(
+                    "<div class='status-pill'><span class='status-dot'></span> "
+                    "<span>🎙️ MMS escutando kreyòl…</span></div>",
+                    unsafe_allow_html=True,
+                )
+                from conversa import kr_says_to_pt
+                result = kr_says_to_pt(audio_bytes)
+                status_slot2.empty()
 
-            st.markdown("<div class='label'>🇭🇹 Ele/ela disse</div>", unsafe_allow_html=True)
-            st.markdown(f"<div class='big-result' style='color:var(--c-kr)'>{result['kr'] or '(silêncio)'}</div>", unsafe_allow_html=True)
-            st.markdown("<div class='label'>🇧🇷 Em português</div>", unsafe_allow_html=True)
-            st.markdown(f"<div class='big-result' style='color:var(--c-pt)'>{result['pt'] or '(traduzindo falhou)'}</div>", unsafe_allow_html=True)
+                st.session_state.conv_history.insert(0, {
+                    "direction": "kr_to_pt",
+                    "src_text": result["kr"],
+                    "tgt_text": result["pt"],
+                    "wav_bytes": None,
+                    "ts": time.time(),
+                })
+                st.session_state.conv_history = st.session_state.conv_history[:10]
+                st.session_state.last_kr_audio_hash = audio_hash
+
+            # Mostra o KR->PT mais recente
+            recent_kr = next((t for t in st.session_state.conv_history if t["direction"] == "kr_to_pt"), None)
+            if recent_kr:
+                st.markdown("<div class='label'>🇭🇹 Ele/ela disse</div>", unsafe_allow_html=True)
+                st.markdown(f"<div class='big-result' style='color:var(--c-kr)'>{recent_kr['src_text'] or '(silêncio)'}</div>", unsafe_allow_html=True)
+                st.markdown("<div class='label'>🇧🇷 Em português</div>", unsafe_allow_html=True)
+                st.markdown(f"<div class='big-result' style='color:var(--c-pt)'>{recent_kr['tgt_text'] or '(traduzindo falhou)'}</div>", unsafe_allow_html=True)
 
     st.markdown("---")
     st.info(
