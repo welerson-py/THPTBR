@@ -79,18 +79,20 @@ Não precisa saber programar pra usar:
 
 ---
 
-## 🧠 As 4 camadas de tradução (PT → KR)
+## 🧠 As 5 camadas de tradução (PT → KR)
 
 Cada camada tem prioridade decrescente. A primeira que tiver match dispara, as outras nem rodam:
 
 | # | Camada | O que faz | Onde fica |
 |---|---|---|---|
-| 1 | **Override exato** | "tansyon = pressão" → forçado pra "swaf = sede" | `data/correcoes.json` (editável!) |
-| 2 | **Cultural direto** | "mamão com açúcar" → **"Se dlo kòk"** (água de coco, gíria HT) | `idiomas.py` IDIOMA_CULTURAL |
-| 3 | **Reescrita de idiomatismo** | "Esse exercício é mamão com açúcar" → "Esse exercício é muito fácil" → NLLB | `idiomas.py` IDIOMA_REWRITES |
-| 4 | **Calor pós-NLLB** | NLLB devolve "se trè fasil" → substitui pra "se dlo kòk" (mais quente) | `idiomas.py` WARMTH_KR |
+| 1 | **Override exato (manual)** | "tansyon = pressão" → forçado pra "swaf = sede" | `data/correcoes.json` (editável!) |
+| 2 | **Glossário de informática** | "clica aqui" → "klike isit la", "mouse" → "sourit" (289 termos curados) | `data/glossario_informatica.json` |
+| 3 | **Cultural direto** | "mamão com açúcar" → **"Se dlo kòk"** (água de coco, gíria HT) | `idiomas.py` IDIOMA_CULTURAL |
+| 4 | **Reescrita de idiomatismo** | "Esse exercício é mamão com açúcar" → "Esse exercício é muito fácil" → NLLB | `idiomas.py` IDIOMA_REWRITES |
+| 5 | **Calor pós-NLLB** | NLLB devolve "se trè fasil" → substitui pra "se dlo kòk" (mais quente) | `idiomas.py` WARMTH_KR |
 
-A camada 4 é o "tempero" — transforma tradução técnica em tradução com alma de oficina.
+A camada 5 é o "tempero" — transforma tradução técnica em tradução com alma de oficina.
+A camada 2 (glossário) garante que vocabulário de inclusão digital (clicar, salvar, navegador, senha, etc.) sai sempre certo, sem depender do NLLB.
 
 ---
 
@@ -165,14 +167,14 @@ oficina-imigrantes-ai/
 
 ---
 
-## 🎙️ Os 3 modos da UI
+## 🎙️ Os 4 modos da UI
 
 ### 📚 Dicionário
 Caixa de busca única. Digite em PT ou KR — o sistema busca nos dois.
 Cada resultado mostra: kreyòl, português, e o **vídeo do YouTube embedado começando no momento exato** que a professora diz aquela palavra. Audio pronunciation grátis.
 
 ### 🎙️ Conversa ao vivo
-Duas colunas lado a lado:
+Duas colunas lado a lado, com **histórico das últimas 10 falas** expandível no topo (cada uma com botão de play pra repetir o áudio kreyòl):
 - **🇧🇷 → 🇭🇹** Voluntário fala PT → Whisper transcreve → NLLB traduz → mostra texto KR grande **e gera áudio kreyòl** via TTS (cacheado em disco, repetições são instantâneas)
 - **🇭🇹 → 🇧🇷** Imigrante fala kreyòl → MMS-1B transcreve → NLLB traduz → voluntário lê PT
 
@@ -182,6 +184,13 @@ Aba dedicada ao imigrante, **toda em kreyòl**. Tem:
 - **18 frases prontas** ("Mwen pa konprann", "Èske w ka repete?", etc) — clica e mostra PT pro voluntário ler
 - **9 sentimentos** ("😟 Mwen pa fin konprann", "💪 Mwen ka fè l") pra expressar estado emocional sem precisar saber PT
 - Banner em PT e KR no topo de todas as telas
+
+### 📱 Pase Telefòn (Passa o Telefone)
+Aba ultra-simplificada pra quando o voluntário **entrega o celular** pro imigrante mexer sozinho:
+- Só 1 botão gigante de microfone, sem distrações
+- Após gravar: texto enorme em kreyòl (o que ele disse) + texto enorme em PT (pro voluntário ler depois)
+- Botão "Pale ankò" pra falar de novo sem mexer em nada
+- Tudo em letras grandes e cores caribenhas pra leitura fácil
 
 ---
 
