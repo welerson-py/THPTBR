@@ -261,12 +261,14 @@ Edite `src/idiomas.py`:
 
 ## 📦 Setup do zero (em outra máquina)
 
+**As 7021 frases vêm com o repo** (em `data/banco_frases.json` + `data/banco_embeddings.npy`, 12MB total). Na primeira vez que abrir a UI, o sistema **importa automaticamente** essas frases pro ChromaDB local em ~5 segundos. Não precisa rodar o daemon pra ter o banco populado!
+
 ```powershell
 # Pre-requisitos: Python 3.12+, Git, winget (Windows 11)
 git clone https://github.com/welerson-py/THPTBR.git
 cd THPTBR
 
-# ffmpeg
+# ffmpeg (so necessario se for processar VIDEO NOVO; nao precisa pra usar)
 winget install Gyan.FFmpeg
 
 # venv + deps
@@ -275,9 +277,26 @@ py -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 .\.venv\Scripts\python.exe -m pip install torch torchaudio --index-url https://download.pytorch.org/whl/cpu
 
-# Primeira execução baixa modelos automaticamente (~10 GB total)
+# Primeira execucao: baixa modelos (~10 GB) + auto-importa as 7021 frases
 .\iniciar_ui.bat
 ```
+
+**Requisitos mínimos**:
+- **Modo Dicionário apenas**: 4GB RAM (só LaBSE carregado, ~1.8GB)
+- **Modo Conversa completo**: 8-16GB RAM (Whisper + MMS + NLLB + TTS todos juntos)
+
+### Regenerando o banco após processar novos vídeos
+
+Quando você processar mais vídeos no seu note, rode esse comando pra atualizar os arquivos versionáveis:
+
+```powershell
+.\.venv\Scripts\python.exe src\exportar_dados.py
+git add data/banco_frases.json data/banco_embeddings.npy
+git commit -m "update: banco com X novas frases"
+git push
+```
+
+Quem fizer `git pull` depois ganha as novas frases automaticamente na próxima execução.
 
 ---
 
